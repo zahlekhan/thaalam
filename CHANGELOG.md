@@ -4,6 +4,12 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T03:46:19+05:30 — Play test of the gist motifs
+
+- Changed: Nothing in code. Checked the gist-to-motif build from `757c5dd` and `15f36d2`.
+- Validation: The six samples were re-read through the local Worker: Jev answers all 12 questions in about 1 s, and the original four answers are unchanged. Generated parts for every space, gesture, order, focus, light, motion and surface option across all six roles, then played 18 of them in the app (`npm run dev:worker`) through a Strudel analyser: all evaluate and sound, with no console errors.
+- Limitations: Kalimba melodies peak around 0.06 to 0.09, against 0.2 to 0.35 for pads and about 0.5 for drums, so an organic-texture melody can be buried in the mix. Not judged by ear.
+
 ## 2026-10-25T02:50:17+05:30 — More instruments, picked by weight
 
 - Changed: Melody, bass, chords and pads now have three instruments for each texture. The photo's weight picks among them: a heavier photo gets the darker one, a lighter photo the brighter one, and a medium photo keeps the voice it had. Drums stay on their five kits. Sitar and vibraphone are still not used. 68 sounds in all.
