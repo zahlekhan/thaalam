@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T01:10:00+05:30 — Page metadata, favicon and share card
+
+- Changed: `web/index.html` now has a description, theme-color, canonical URL, Open Graph and Twitter card tags, and favicon links. New `web/public/og.png` (1200x630 share card rendered with Pillow: tilted photo cards with role-colour magnets on the enamel background), `favicon.svg`, `favicon-32.png` and `apple-touch-icon.png`.
+- Why: Shared links showed no title, description or preview image.
+- Validation: `npm --prefix web run build` passes; assets land in `web/dist`.
+- Limitations: OG image is static, not per-canvas; absolute URLs point at the workers.dev domain (update if a custom domain is added).
+
 ## 2026-10-25T00:59:00+05:30 — Share gets its own button; start sheet previews the gallery
 
 - Changed: Listing a canvas in the public gallery moved out of the Invite sheet into its own "Share" button and sheet (optional name, view-only explanation, "Share publicly", or "See the gallery" / "Remove from gallery" once listed). Invite now only covers the private link, QR code and who's here, with a note pointing to Share. Sharing an empty canvas is blocked with "Add a photo first". The start sheet for a new canvas shows up to three shared canvases as small fridge doors with "See all"; they open view-only. On phones the bar reads "Add · Invite · Share". `useGallery()` and `FridgeTile` are shared by the gallery page and the preview.
