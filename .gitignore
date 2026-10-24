@@ -7,3 +7,5 @@ web/public/test/
 .DS_Store
 .env.local
 *.tsbuildinfo
+*.tsbuildinfo
+.wrangler/
