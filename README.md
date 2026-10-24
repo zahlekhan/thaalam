@@ -8,8 +8,8 @@ Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[D
 
 - **Project name:** Thaalam
 - **Short description:** Each photo becomes a card that plays one part of a loop (kick, percussion, bass, chords, melody or texture). A vision model reads the photo's mood, energy, texture and role; the browser turns that reading plus pixel measurements into a Strudel pattern. Cards on the stage play together; cards off the stage are silent. It's a playful way for anyone, musician or not, to make an original loop from their own photos.
-- **Team:** TODO — participant names and GitHub handles; maximum 4 members.
-- **Working demo:** TODO — deployed Cloudflare Workers URL. Local steps are below.
+- **Team:** zahle khan
+- **Working demo:** [Link](https://thaalam.theotherkhan271.workers.dev/)
 - **Technology stack:** React 19, TypeScript, Vite 8, tldraw, Strudel (`@strudel/web`) in `web/`; Python FastAPI in `server/` (local); Cloudflare Worker in `worker/` (hosted); Jev (TypeSafe) and vegaml vision models.
 
 ### Run the project
