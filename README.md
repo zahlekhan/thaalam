@@ -21,25 +21,25 @@ Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[D
 ```mermaid
 flowchart LR
     subgraph Browser["Browser (web/)"]
-        A[Drop or paste a photo<br/>on the fridge canvas] --> B[Shrink to a 512px JPEG<br/>+ measure pixels:<br/>brightness, warmth, busyness,<br/>palette, saturation, clash, sharpness]
-        B -->|form POST| C[/api/analyze]
-        C --> D{Reading = model answers<br/>+ pixel measurements}
-        D --> E[music.ts builds<br/>a Strudel pattern]
-        E --> F[@strudel/web plays<br/>the loop in Web Audio]
+        A["Drop or paste a photo<br/>on the fridge canvas"] --> B["Shrink to a 512px JPEG<br/>and measure pixels:<br/>brightness, warmth, busyness,<br/>palette, saturation, clash, sharpness"]
+        B -->|"form POST"| C["/api/analyze"]
+        C --> D{"Reading = model answers<br/>+ pixel measurements"}
+        D --> E["music.ts builds<br/>a Strudel pattern"]
+        E --> F["@strudel/web plays<br/>the loop in Web Audio"]
     end
 
     subgraph Cloudflare["Cloudflare Worker (worker/index.js)"]
-        C --> G[Jev vision model:<br/>mood, energy, texture, role,<br/>8 gist questions, safety check]
-        G -->|flagged nudity/profanity| H[422 — card removed,<br/>photo never shared]
-        G -->|clean| I[/api/photos upload]
-        I --> J[(R2 bucket<br/>thaalam-photos)]
-        J --> K[/photos/id served<br/>with immutable cache]
+        C --> G["Jev vision model:<br/>mood, energy, texture, role,<br/>8 gist questions, safety check"]
+        G -->|"flagged nudity/profanity"| H["422 — card removed,<br/>photo never shared"]
+        G -->|clean| I["/api/photos upload"]
+        I --> J[("R2 bucket<br/>thaalam-photos")]
+        J --> K["serves /photos/<br/>with immutable cache"]
     end
 
-    subgraph Sync["Rooms & gallery"]
-        L[Yjs doc: cards, positions,<br/>photo URLs] <--> M[(Room Durable Object<br/>persisted forever)]
-        M -->|publish| N[(Gallery Durable Object)]
-        N --> O[/gallery — browsable<br/>public canvases]
+    subgraph Sync["Rooms and gallery"]
+        L["Yjs doc: cards, positions,<br/>photo URLs"] <--> M[("Room Durable Object<br/>persisted forever")]
+        M -->|publish| N[("Gallery Durable Object")]
+        N --> O["/gallery — browsable<br/>public canvases"]
     end
 
     K --> L

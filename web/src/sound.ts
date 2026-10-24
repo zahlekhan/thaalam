@@ -1,12 +1,16 @@
 // Strudel setup plus the hook that plucks each card on its own notes.
 
-import { initStrudel, samples, evaluate, hush } from '@strudel/web'
+import { initStrudel, initAudio, samples, evaluate, hush } from '@strudel/web'
 import { registerSoundfonts } from '@strudel/soundfonts'
 import { pluck } from './swing'
 
 let ready: Promise<unknown> | null = null
 
 export function startSound() {
+  // Create/resume the AudioContext now, inside the gesture. initStrudel defers this to a document
+  // mousedown listener, but pane mousedowns are swallowed by d3-zoom before they reach document —
+  // so a tap on empty canvas stayed silent until the click happened to land on a card.
+  initAudio()
   ready ??= initStrudel({
     prebake: () => Promise.all([samples('github:tidalcycles/dirt-samples'), registerSoundfonts()]),
   })
