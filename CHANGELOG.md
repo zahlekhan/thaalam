@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T00:45:00+05:30 — Public gallery opens canvases view-only
+
+- Changed: Gallery cards link to `/?room=<id>&view=1`. View mode joins the room straight away (no join sheet), keeps pan, zoom and play/stop, and hides editing: no drag, select, mute, delete, add, invite or share controls, plus a "View only" note and a "Make your own" link in the bar. Share/publish copy now says visitors can look and listen, not add photos.
+- Why: Public gallery links previously gave full edit access to anyone.
+- Validation: `npm --prefix web run build` passes.
+- Limitations: View-only is enforced in the UI, not the server — y-partyserver has no readonly mode, so a crafted client could still write to the room doc.
+
 ## 2026-10-25T00:30:00+05:30 — Camera in Add photo, canvas names in the gallery, code view as a debug button
 
 - Changed: "Take a photo" in the Add-photo sheet opens the live camera (`Camera.tsx`, falls back to the phone camera app where getUserMedia is unavailable). The publish sheet now offers an optional canvas name, sent with the publish POST; the worker stores it on the Room DO and the Gallery lists it (`name` column added via ALTER for existing tables). Gallery cards show the name as the title with "by <names>" in the meta line. "See the code" moved out of the "⋯" menu to a `?dev`-only floating button at the bottom right.

@@ -50,6 +50,9 @@ let currentModel = localStorage.getItem('thaalam-model') ?? 'jev'
 
 const DEV = new URLSearchParams(location.search).has('dev')
 
+// Gallery links add ?view=1: look and listen, no editing.
+const VIEW_ONLY = new URLSearchParams(location.search).has('view')
+
 // A shared link drops you straight into its room.
 const initialRoom = roomFromUrl()
 if (initialRoom) joinRoom(initialRoom)
@@ -107,7 +110,7 @@ function Board() {
   const flow = useReactFlow<CardNode>()
   const [nodes, setNodes] = useState<CardNode[]>(() => nodesFromDoc([]))
   const soundState = useSound()
-  const [joined, setJoined] = useState(false)
+  const [joined, setJoined] = useState(VIEW_ONLY)
   const fitted = useRef(false)
   const m = useMix()
 
@@ -233,6 +236,7 @@ function Board() {
   // Pasted images land in the middle of the screen.
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
+      if (VIEW_ONLY) return
       const files = Array.from(e.clipboardData?.files ?? [])
       if (files.length) addFiles(files)
     }
@@ -247,7 +251,7 @@ function Board() {
       if (e.key === ' ') {
         e.preventDefault()
         toggleSound()
-      } else if (e.key === 'm' || e.key === 'M') {
+      } else if (!VIEW_ONLY && (e.key === 'm' || e.key === 'M')) {
         flow.getNodes().filter((n) => n.selected).forEach((n) => toggleMute(n.id))
       }
     }
@@ -261,7 +265,7 @@ function Board() {
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault()
-        addFiles(Array.from(e.dataTransfer.files), flow.screenToFlowPosition({ x: e.clientX, y: e.clientY }))
+        if (!VIEW_ONLY) addFiles(Array.from(e.dataTransfer.files), flow.screenToFlowPosition({ x: e.clientX, y: e.clientY }))
       }}
     >
       <ReactFlow
@@ -272,14 +276,18 @@ function Board() {
         minZoom={0.3}
         maxZoom={2}
         zoomOnDoubleClick={false}
-        deleteKeyCode={['Backspace', 'Delete']}
+        nodesDraggable={!VIEW_ONLY}
+        elementsSelectable={!VIEW_ONLY}
+        deleteKeyCode={VIEW_ONLY ? null : ['Backspace', 'Delete']}
         attributionPosition="top-right"
         aria-label="Fridge door with photo cards"
       />
       <TopBar />
-      <SelectionBar nodes={nodes} onDone={() => flow.setNodes((ns) => ns.map((n) => ({ ...n, selected: false })))} />
+      {!VIEW_ONLY && (
+        <SelectionBar nodes={nodes} onDone={() => flow.setNodes((ns) => ns.map((n) => ({ ...n, selected: false })))} />
+      )}
       <BottomBar soundState={soundState} onToggleSound={toggleSound} onFiles={addFiles} onSample={addSample} />
-      {m.total === 0 && joined && <EmptyHint />}
+      {m.total === 0 && joined && !VIEW_ONLY && <EmptyHint />}
       <ToastView />
       {!joined && (
         <JoinSheet
@@ -415,7 +423,7 @@ function usePeers() {
   return { names: Array.from(names.values()), room, setRoom }
 }
 
-type Sheet = null | 'add' | 'invite' | 'more' | 'code'
+type Sheet = null | 'add' | 'invite' | 'share' | 'more' | 'code'
 
 function BottomBar({
   soundState,
@@ -444,28 +452,43 @@ function BottomBar({
         >
           {soundState === 'on' ? <StopIcon size={24} /> : <PlayIcon size={24} />}
         </button>
-        {soundState === 'loading' ? (
+        {VIEW_ONLY ? (
+          <>
+            <span className="view-note">View only</span>
+            <a className="bar-btn" href="/">
+              Make your own
+            </a>
+          </>
+        ) : soundState === 'loading' ? (
           <span className="loading-note">Loading sounds…</span>
         ) : (
           <button className="bar-btn" onClick={() => setSheet('add')}>
             <PlusIcon size={20} />
-            Add photo
+            Add<span className="wide-only">&nbsp;photo</span>
           </button>
         )}
-        <button className="bar-btn invite" onClick={() => setSheet('invite')}>
-          <PeopleIcon size={20} />
-          {here > 1 ? (
-            <>
-              Invite <span className="wide-only">· {here} here</span>
-              <span className="narrow-only">· {here}</span>
-            </>
-          ) : (
-            'Invite'
-          )}
-        </button>
-        <button className="bar-btn icon" onClick={() => setSheet(sheet === 'more' ? null : 'more')} aria-label="More" aria-expanded={sheet === 'more'}>
-          <MoreIcon size={22} />
-        </button>
+        {!VIEW_ONLY && (
+          <>
+            <button className="bar-btn invite" onClick={() => setSheet('invite')}>
+              <PeopleIcon size={20} />
+              {here > 1 ? (
+                <>
+                  Invite <span className="wide-only">· {here} here</span>
+                  <span className="narrow-only">· {here}</span>
+                </>
+              ) : (
+                'Invite'
+              )}
+            </button>
+            <button className="bar-btn share" onClick={() => setSheet('share')} aria-label="Share in the public gallery">
+              <GalleryIcon size={20} />
+              Share
+            </button>
+            <button className="bar-btn icon" onClick={() => setSheet(sheet === 'more' ? null : 'more')} aria-label="More" aria-expanded={sheet === 'more'}>
+              <MoreIcon size={22} />
+            </button>
+          </>
+        )}
       </nav>
       {DEV && (
         <button
@@ -480,6 +503,7 @@ function BottomBar({
       {sheet === 'more' && <MoreMenu onClose={close} />}
       {sheet === 'add' && <AddSheet onClose={close} onFiles={onFiles} onSample={onSample} />}
       {sheet === 'invite' && <InviteSheet onClose={close} peers={peers} />}
+      {sheet === 'share' && <ShareSheet onClose={close} peers={peers} />}
       {sheet === 'code' && <CodeSheet onClose={close} />}
     </>
   )
@@ -594,30 +618,20 @@ function Qr({ text }: { text: string }) {
   )
 }
 
-function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnType<typeof usePeers> }) {
-  const { room, setRoom, names } = peers
-  const [copied, setCopied] = useState(false)
-  const [isPublic, setIsPublic] = useState<boolean | null>(null)
-  const [confirming, setConfirming] = useState(false)
-  const [canvasName, setCanvasName] = useState('')
-  const linkRef = useRef<HTMLInputElement>(null)
-
-  // Opening the invite turns a solo canvas into a room; whatever is on it carries over.
+// Inviting and sharing both need a room: opening either turns a solo canvas into one,
+// and whatever is on it carries over.
+function useEnsureRoom({ room, setRoom }: ReturnType<typeof usePeers>) {
   useEffect(() => {
     if (!room) setRoom(createRoom())
   }, [room, setRoom])
+  return room
+}
 
-  useEffect(() => {
-    if (!room) return
-    fetch(`${API_URL}/api/rooms/${room}`)
-      .then((r) => r.json())
-      .then((s) => {
-        setIsPublic(!!s.published)
-        if (s.name) setCanvasName(s.name)
-      })
-      .catch(() => setIsPublic(false))
-  }, [room])
-
+// Private: people with the link or QR join this canvas.
+function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnType<typeof usePeers> }) {
+  const room = useEnsureRoom(peers)
+  const [copied, setCopied] = useState(false)
+  const linkRef = useRef<HTMLInputElement>(null)
   const link = room ? location.href : ''
 
   const copy = async () => {
@@ -628,22 +642,6 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
     } catch {
       linkRef.current?.select()
       toast("Couldn't copy automatically. The link is selected, so copy it from there.")
-    }
-  }
-
-  const setListing = async (publish: boolean) => {
-    try {
-      const r = await fetch(`${API_URL}/api/rooms/${room}/${publish ? 'publish' : 'unpublish'}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: canvasName.trim() }),
-      })
-      if (!r.ok) throw new Error(`${r.status}`)
-      setIsPublic(publish)
-      setConfirming(false)
-      toast(publish ? 'Listed in the public gallery.' : 'Removed from the public gallery.')
-    } catch {
-      toast("Couldn't reach the server, so nothing changed. Try again in a moment.", { tone: 'error' })
     }
   }
 
@@ -667,51 +665,97 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
       <h3>Here now</h3>
       <ul className="people">
         <li className="me">{getName() || 'You'} (you)</li>
-        {names.map((n, i) => (
+        {peers.names.map((n, i) => (
           <li key={i}>{n}</li>
         ))}
       </ul>
-      <div className="publish">
-        {isPublic === null ? null : isPublic ? (
-          <>
-            <p>
-              <b>This canvas is in the public gallery.</b> Anyone can open it there.
-            </p>
+      <p className="hint">
+        Only people with the link can find this canvas. To let anyone open it, use Share.
+      </p>
+    </SheetFrame>
+  )
+}
+
+// Public: list the canvas in the gallery, where anyone can open it.
+function ShareSheet({ onClose, peers }: { onClose: () => void; peers: ReturnType<typeof usePeers> }) {
+  const room = useEnsureRoom(peers)
+  const { total } = useMix()
+  const [isPublic, setIsPublic] = useState<boolean | null>(null)
+  const [failed, setFailed] = useState(false)
+  const [canvasName, setCanvasName] = useState('')
+
+  useEffect(() => {
+    if (!room) return
+    fetch(`${API_URL}/api/rooms/${room}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`${r.status}`))))
+      .then((s) => {
+        setIsPublic(!!s.published)
+        if (s.name) setCanvasName(s.name)
+      })
+      .catch(() => setFailed(true))
+  }, [room])
+
+  const setListing = async (publish: boolean) => {
+    try {
+      const r = await fetch(`${API_URL}/api/rooms/${room}/${publish ? 'publish' : 'unpublish'}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: canvasName.trim() }),
+      })
+      if (!r.ok) throw new Error(`${r.status}`)
+      setIsPublic(publish)
+      toast(publish ? 'Shared in the public gallery.' : 'Removed from the public gallery.')
+    } catch {
+      toast("Couldn't reach the server, so nothing changed. Try again in a moment.", { tone: 'error' })
+    }
+  }
+
+  return (
+    <SheetFrame title="Share in the public gallery" onClose={onClose}>
+      {failed ? (
+        <p className="hint">Couldn't check whether this canvas is shared. Check your connection and open Share again.</p>
+      ) : isPublic === null ? (
+        <p className="hint">Checking…</p>
+      ) : isPublic ? (
+        <div className="publish">
+          <p>
+            <b>{canvasName || 'This canvas'} is in the public gallery.</b> Anyone can open it and hear it — view only.
+          </p>
+          <div className="row">
+            <a className="primary-btn" href="/gallery">
+              See the gallery
+            </a>
             <button className="text-btn" onClick={() => setListing(false)}>
               Remove from gallery
             </button>
-          </>
-        ) : confirming ? (
-          <>
-            <p>
-              <b>List this canvas in the public gallery?</b> Anyone can open it and see these photos. You can remove it any
-              time.
-            </p>
-            <label className="canvas-name">
-              Name in the gallery (optional)
-              <input
-                value={canvasName}
-                onChange={(e) => setCanvasName(e.target.value)}
-                placeholder="e.g. Friday night jam"
-                maxLength={80}
-              />
-            </label>
-            <div className="row">
-              <button className="primary-btn" onClick={() => setListing(true)}>
-                List it publicly
-              </button>
-              <button className="text-btn" onClick={() => setConfirming(false)}>
-                Cancel
-              </button>
-            </div>
-          </>
-        ) : (
-          <button className="text-btn" onClick={() => setConfirming(true)}>
-            <GalleryIcon size={18} />
-            Share in the public gallery…
-          </button>
-        )}
-      </div>
+          </div>
+        </div>
+      ) : (
+        <div className="publish">
+          <p>
+            Anyone visiting the gallery can open this canvas and hear it — it's view only, so your photos stay as you
+            left them. The names of people who added photos are shown with it. You can remove it any time.
+          </p>
+          <label className="canvas-name">
+            Name in the gallery (optional)
+            <input
+              value={canvasName}
+              onChange={(e) => setCanvasName(e.target.value)}
+              placeholder="e.g. Friday night jam"
+              maxLength={80}
+              data-autofocus
+            />
+          </label>
+          {total ? (
+            <button className="primary-btn" onClick={() => setListing(true)}>
+              <GalleryIcon size={20} />
+              Share publicly
+            </button>
+          ) : (
+            <p className="hint">Add a photo first. An empty fridge has nothing to hear.</p>
+          )}
+        </div>
+      )}
     </SheetFrame>
   )
 }
@@ -812,6 +856,7 @@ function JoinSheet({ onJoin }: { onJoin: (withSound: boolean) => void }) {
         <button className="text-btn" type="button" onClick={() => join(false)}>
           Look around without sound
         </button>
+        {!inRoom && <GalleryPreview />}
         <p className="fine">
           Photos you add are shared with everyone in the room and read by an AI model. No nudity or profanity. Canvases are
           kept, and sharing one in the public gallery lets anyone open it.
@@ -861,10 +906,10 @@ const joinNames = (names: string[]) =>
 const PREVIEW_MAGNETS = ['--kick', '--bass', '--percussion', '--chords']
 const PREVIEW_TILT = [-5, 4, -2, 6]
 
-function GalleryPage() {
+// The public gallery's canvases, newest first. null while loading.
+function useGallery() {
   const [rooms, setRooms] = useState<GalleryRoom[] | null>(null)
   const [failed, setFailed] = useState(false)
-  const last = localStorage.getItem('thaalam-last-room')
   useEffect(() => {
     fetch(`${API_URL}/api/gallery`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`${r.status}`))))
@@ -874,6 +919,64 @@ function GalleryPage() {
         setRooms([])
       })
   }, [])
+  return { rooms, failed }
+}
+
+// One shared canvas as a little fridge door with its first photos stuck on.
+function FridgeTile({ r, prints = 4 }: { r: GalleryRoom; prints?: number }) {
+  const title = r.name || (r.names?.length ? joinNames(r.names) : 'A shared fridge')
+  const meta = [
+    r.name && r.names?.length ? `by ${joinNames(r.names)}` : '',
+    MOOD_WORD[r.mood ?? ''] ?? r.mood,
+    `${r.cards} ${r.cards === 1 ? 'photo' : 'photos'}`,
+    new Date(r.at).toLocaleDateString(),
+  ]
+    .filter(Boolean)
+    .join(' · ')
+  return (
+    <a className="fridge" href={`/?room=${r.room}&view=1`}>
+      <div className="mini-door">
+        {r.previews.slice(0, prints).map((p, i) => (
+          <span key={p} className="mini-print" style={{ rotate: `${PREVIEW_TILT[i]}deg` }}>
+            <span className="mini-magnet" style={{ background: `var(${PREVIEW_MAGNETS[i]})` }} />
+            <img src={p} alt="" />
+          </span>
+        ))}
+      </div>
+      <span className="fridge-meta">
+        <b>{title}</b>
+        <span>{meta}</span>
+      </span>
+    </a>
+  )
+}
+
+// On the start sheet: a few canvases people shared, so a first visit can hear one before making their own.
+// Hidden when the gallery is empty or unreachable; the start sheet works without it.
+function GalleryPreview() {
+  const { rooms } = useGallery()
+  const shown = (rooms ?? []).filter((r) => r.previews.length).slice(0, 3)
+  if (!shown.length) return null
+  return (
+    <section className="gallery-preview" aria-labelledby="preview-title">
+      <div className="preview-head">
+        <h2 id="preview-title">Or open one people shared</h2>
+        <a href="/gallery">See all</a>
+      </div>
+      <ul>
+        {shown.map((r) => (
+          <li key={r.room}>
+            <FridgeTile r={r} prints={2} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+function GalleryPage() {
+  const { rooms, failed } = useGallery()
+  const last = localStorage.getItem('thaalam-last-room')
   return (
     <div className="gallery-page">
       <header className="gallery-head">
@@ -890,36 +993,12 @@ function GalleryPage() {
       ) : failed ? (
         <p className="gallery-empty">Couldn't load the gallery. Check your connection and refresh.</p>
       ) : rooms.length === 0 ? (
-        <p className="gallery-empty">
-          Nothing here yet. In a room, open Invite and choose “Share in the public gallery”.
-        </p>
+        <p className="gallery-empty">Nothing here yet. On your canvas, press Share to put it here.</p>
       ) : (
         <ul className="gallery-grid">
           {rooms.map((r) => (
             <li key={r.room}>
-              <a className="fridge" href={`/?room=${r.room}`}>
-                <div className="mini-door">
-                  {r.previews.slice(0, 4).map((p, i) => (
-                    <span key={p} className="mini-print" style={{ rotate: `${PREVIEW_TILT[i]}deg` }}>
-                      <span className="mini-magnet" style={{ background: `var(${PREVIEW_MAGNETS[i]})` }} />
-                      <img src={p} alt="" />
-                    </span>
-                  ))}
-                </div>
-                <span className="fridge-meta">
-                  <b>{r.name || (r.names?.length ? joinNames(r.names) : 'A shared fridge')}</b>
-                  <span>
-                    {[
-                      r.name && r.names?.length ? `by ${joinNames(r.names)}` : '',
-                      MOOD_WORD[r.mood ?? ''] ?? r.mood,
-                      `${r.cards} ${r.cards === 1 ? 'photo' : 'photos'}`,
-                      new Date(r.at).toLocaleDateString(),
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </span>
-                </span>
-              </a>
+              <FridgeTile r={r} />
             </li>
           ))}
         </ul>

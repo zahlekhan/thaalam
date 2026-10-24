@@ -481,11 +481,23 @@ p {
   flex: none;
   width: calc(var(--u) * 6.5);
 }
+.bar-btn.share {
+  flex: none;
+  padding: 0 calc(var(--u) * 2);
+}
 .loading-note {
   flex: 1;
   text-align: center;
   font-weight: 600;
   color: var(--ink-soft);
+}
+.view-note {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  padding: 0 var(--u);
+  white-space: nowrap;
 }
 
 /* ---------- More menu ---------- */
@@ -721,6 +733,9 @@ p {
   font-size: 15px;
   line-height: 1.45;
 }
+.publish a.primary-btn {
+  text-decoration: none;
+}
 .publish .row {
   display: flex;
   gap: var(--u);
@@ -844,6 +859,71 @@ p {
 .join-sheet .text-btn {
   align-self: center;
   margin-top: calc(var(--u) * -1);
+}
+/* A few shared canvases under the start buttons, smaller than the gallery's own doors. */
+.gallery-preview {
+  border-top: 2px solid var(--line);
+  padding-top: calc(var(--u) * 2);
+}
+.preview-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--u);
+  margin-bottom: calc(var(--u) * 1.5);
+}
+.preview-head h2 {
+  font-size: 15px;
+  font-weight: 650;
+}
+.preview-head a {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
+.gallery-preview ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(var(--u) * 1.5);
+}
+.gallery-preview .fridge {
+  gap: 6px;
+}
+.gallery-preview .mini-door {
+  height: 88px;
+  border-radius: 12px;
+  gap: 6px;
+  padding: var(--u) 6px;
+  flex-wrap: nowrap;
+}
+.gallery-preview .mini-print {
+  padding: 3px 3px 7px;
+}
+.gallery-preview .mini-print img {
+  width: 40px;
+  height: 36px;
+}
+.gallery-preview .mini-magnet {
+  top: -5px;
+  margin-left: -5px;
+  width: 10px;
+  height: 10px;
+}
+.gallery-preview .fridge-meta b,
+.gallery-preview .fridge-meta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gallery-preview .fridge-meta b {
+  font-size: 14px;
+}
+.gallery-preview .fridge-meta span {
+  font-size: 12px;
 }
 .fine {
   font-size: 13px;
@@ -1086,8 +1166,13 @@ p {
     font-size: 15px;
   }
   .bar-btn.invite svg,
+  .bar-btn.share svg,
   .wide-only {
     display: none;
+  }
+  .bar-btn.share {
+    flex: 1;
+    padding: 0;
   }
 }
 
