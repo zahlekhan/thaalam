@@ -174,6 +174,14 @@ function Board() {
     } else if (sound === 'off') startPlaying()
   }, [startPlaying])
 
+  // View-only links skip the join sheet, so no gesture ever starts the audio — browsers
+  // require one. A view link exists to listen, so the first tap anywhere plays the loop.
+  useEffect(() => {
+    if (!VIEW_ONLY) return
+    addEventListener('pointerdown', startPlaying, { once: true })
+    return () => removeEventListener('pointerdown', startPlaying)
+  }, [startPlaying])
+
   const onNodesChange = useCallback((changes: NodeChange<CardNode>[]) => {
     const kept = changes.filter((ch) => ch.type !== 'remove')
     setNodes((n) => applyNodeChanges(kept, n))
@@ -477,7 +485,9 @@ function BottomBar({
         </button>
         {VIEW_ONLY ? (
           <>
-            <span className="view-note">View only</span>
+            <span className="view-note">
+              {soundState === 'loading' ? 'Loading sounds…' : soundState === 'on' ? 'View only' : 'Tap anywhere to listen'}
+            </span>
             <a className="bar-btn" href="/">
               Make your own
             </a>
