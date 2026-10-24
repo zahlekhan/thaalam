@@ -6,6 +6,7 @@ import { API_URL, shrink, type ModelReading } from './reading'
 import { mixFor } from './music'
 import { play, startSound, stopSound } from './sound'
 import { addCard, playingCards, removeCards, toggleMute } from './canvas'
+import { Camera, hasLiveCamera } from './Camera'
 import {
   cards,
   createRoom,
@@ -43,9 +44,10 @@ type Sample = {
   readings: Record<string, ModelReading>
 }
 
-// Which model reads photos. Jev by default; developers can switch with ?dev in the URL.
-const DEV = new URLSearchParams(location.search).has('dev')
+// Which model reads photos. Jev by default; switch it from the Options menu.
 let currentModel = localStorage.getItem('thaalam-model') ?? 'jev'
+
+const DEV = new URLSearchParams(location.search).has('dev')
 
 // A shared link drops you straight into its room.
 const initialRoom = roomFromUrl()

@@ -8,7 +8,7 @@ export type CardData = {
   id: string
   x: number
   y: number
-  status: string // 'reading' | 'ready' | 'error'
+  status: string // 'reading' | 'ready'
   model: string // JSON ModelReading, '' until read
   pixels: string // JSON Pixels, '' until measured
   muted?: boolean // stays on the canvas but silent

@@ -297,6 +297,120 @@ p {
 .play:hover {
   background: var(--go-hover);
 }
+.camera {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+.camera-box {
+  background: #111;
+  border-radius: 18px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 94vw;
+}
+.camera video {
+  display: block;
+  width: min(640px, 90vw);
+  max-height: 70vh;
+  border-radius: 12px;
+  background: #000;
+  object-fit: cover;
+}
+.camera video.mirror {
+  transform: scaleX(-1);
+}
+.camera-error {
+  color: #fff;
+  max-width: 320px;
+  margin: 24px 12px;
+  line-height: 1.4;
+}
+.camera-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.camera-actions button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 15px;
+  background: #eee;
+  cursor: pointer;
+}
+.camera-actions button.primary {
+  background: #ff6a3d;
+  color: #fff;
+  font-weight: 600;
+}
+.camera-actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.options {
+  position: absolute;
+  bottom: 24px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.options-toggle {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+.options-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.97);
+  padding: 12px 14px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  font-size: 14px;
+}
+.options-menu label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.options-menu select {
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 14px;
+  background: #fff3c4;
+}
+@media (max-width: 900px) {
+  .options {
+    bottom: 104px;
+  }
+}
+.disclaimer {
+  max-width: 380px;
+  margin: 0 16px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 22px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
 .play.on {
   background: var(--ink);
 }

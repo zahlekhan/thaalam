@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-24T23:55:00+05:30 — Merge react-flow-rooms into main, deploy to Cloudflare
+
+- Changed: Merged `origin/main` (logging, camera capture, Options menu) with `react-flow-rooms` (permanent rooms, photos in R2, safety moderation, public gallery). Conflict resolutions: `worker/index.js` keeps persistent rooms + Gallery and adds main's structured logging and robust Jev reply parsing; `App.tsx` keeps Camera, publish/gallery UI, and `PhotoRejected` handling, dropping the top-bar Code button and `DEV` model select (now covered by the Options menu); `styles.css`, `server/app.py`, `AI_USAGE.md`, `CHANGELOG.md` keep both sides.
+- Why: Deploy the full feature set to `main`.
+- Validation: `npm --prefix web run build`, `npx tsc -b`, `node --check worker/index.js`, `python3 -m py_compile server/app.py` passed. `wrangler deploy` succeeded; `/api/health` returns `{"ok":true,"models":["jev"]}` and `/api/gallery` returns an empty room list.
+- Limitations: Gallery returned no published rooms after deploy. Merge exercised endpoints only; room sync and camera flow not re-tested end to end on the deployed worker.
+
 ## 2026-10-24T23:34:20+05:30 — Fridge Door redesign: scattered canvas, mute/delete, join, invite, gallery
 
 - Changed: Replaced the stage-and-toolbar UI with the "Fridge Door" design. Photos hang at angles on a mint enamel canvas, each held by a magnet in its role colour that bounces on its notes (the old card glow pulse moved to the magnet). No stage: every card plays unless muted. Tap a card to get a pill above the bottom bar with Mute/Unmute and Delete; delete is instant with a 6-second Undo (one Undo restores every card from a multi-delete). New bottom bar with Play/Stop (with a loading state), Add photo (sheet with file picker and the 6 samples), Invite and a "⋯" menu (code view, public gallery, `?dev` model picker). New join screen: type a name or keep a random one, then "Join the jam"/"Start jamming" (or look around without sound); names are shared with the room and new joiners are announced. Invite sheet: room link with Copy, QR code, who's here, and listing in the public gallery behind a confirmation. The gallery page uses the same look and titles canvases by the people who made them and their mood. Status chip in plain words ("6 playing · 98 BPM · calm", "Sound off · 7 photos"), highlighted until noticed when the tempo or mood changes. New photos land in a free spot instead of on top of other cards; phones open on the busiest part of the canvas at a readable size. The red crash banner became a dismissible toast with a recovery step. Keyboard: Space plays/stops, M mutes, Delete/Backspace deletes. Self-hosted Rubik font and authored SVG icons.
@@ -19,12 +26,33 @@ Record each meaningful project change during the event, newest first. Update thi
 - Validation: Documentation only. Checked that `PRODUCT.md` no longer uses stage or parking terms except where it notes the current code.
 - Limitations: Not built yet. The app still uses the stage frame and parking until the redesign lands.
 
+## 2026-10-24T22:31:11+05:30 — Logging for the server, Worker and web app
+
+- Changed: `server/app.py` logs startup settings (no key value), each reading (model, bytes, ms, answers), rejected uploads, and Jev failures. Jev timeouts, network errors and malformed replies now return a 502 with a clear `detail` instead of a bare 500. `worker/index.js` logs the same events as JSON objects for Cloudflare observability, handles the same Jev failures, and logs room connect/close/error in `Room`. `web/src/App.tsx` and `web/src/reading.ts` log failed readings (with the server's `detail`), a failed health check, and a failed samples load. `web/src/CardShape.tsx` now shows "Can't reach the model" when the model call failed; before, the `'error'` status it checked was never set. README documents the logs.
+- Why: Before this, failures showed only as status codes in the logs, with the reason visible only to the browser.
+- Validation: `npm --prefix web run build` passed. Ran the FastAPI server locally and checked the logs and responses for a real Jev reading, a bad key (401 to 502), an unreachable Jev (ConnectError to 502), a non-image upload (400), and an unavailable model (400). Ran `wrangler dev` and checked the same Jev success, 401 and unavailable-model cases, plus a room WebSocket connect and close.
+- Limitations: A Jev timeout and a malformed Jev reply were not triggered directly; they share the handlers checked above. Locally, `wrangler dev` prints "Uncaught Error: Network connection lost" after a room socket closes; this also happens on the code before this change. Root `npm ci` needs `--legacy-peer-deps` (a `@cloudflare/workers-types` peer conflict between `wrangler` and `partyserver`); this is unchanged.
+
 ## 2026-10-24T22:20:06+05:30 — Add product context for design work
 
 - Changed: Added `PRODUCT.md`, which records the product facts design work should keep: users (friends jamming together first), purpose, positioning (a photo is a stem; the model reads, code writes the music), terminology, constraints, evidence on hand, and principles.
 - Why: Give later UI and design work (the Impeccable skill) a confirmed product record instead of re-deriving it from the code each time.
 - Validation: Checked the facts against `CONTEXT.md`, `README.md` and the current code (`web/src/`, `worker/index.js`, `server/app.py`). The user confirmed the primary audience, the horizon and how the brand uses the name.
 - Limitations: Photo and room retention and the public gallery were changing in the uncommitted working tree, so `PRODUCT.md` marks them as open. `README.md` and `CONTEXT.md` still describe tldraw and say rooms aren't built yet; this entry doesn't update them.
+
+## 2026-10-24T22:11:43+05:30 — Options menu at the bottom right
+
+- Changed: Added an "Options" button at the bottom right of `web/src/App.tsx` that opens a menu with "Show code" and the model picker. Removed the "Code" button and the `?dev`-only model select from the top bar (`web/src/styles.css`, `README.md`, `SUBMISSION.md`).
+- Why: Keep the top bar for the main actions and gather settings in one place.
+- Validation: `npx tsc -b` passed. Checked in headless Chrome at 1280x800 and 390x844 against a stub `/api/health`: the menu opens, lists Jev and vegaml, and "Show code" shows the code panel.
+- Limitations: The model picker is now visible to everyone (no longer behind `?dev`); it is hidden when `/api/health` is unreachable. On narrow phones the code panel still overlaps the wrapped top bar, as before.
+
+## 2026-10-24T22:06:28+05:30 — Take photos with the webcam or phone camera
+
+- Changed: New **Camera** button in the top bar (`web/src/Camera.tsx`, `web/src/App.tsx`, `web/src/styles.css`). It opens a live camera preview with Snap, Flip (front/back) and Cancel; the snapshot becomes a card just like an uploaded photo. Where the live camera API isn't available (plain-http pages), it falls back to a file input with `capture="environment"`, which opens the phone's camera app.
+- Why: Make it easier to add photos from a laptop webcam or phone camera without saving a file first.
+- Validation: `npm --prefix web run build` passed on Node 24. In headless Chrome with a fake camera, opening the camera showed a 1280x1280 stream, Flip switched to the mirrored front view, and Snap closed the modal and added one card that was read and placed on the stage.
+- Limitations: Live preview needs https or localhost (browser rule); opening the dev server from a phone over plain-http LAN uses the camera-app fallback instead. Not tested on a real phone.
 
 ## 2026-10-24T21:44:19+05:30 — Add hackathon documentation
 

@@ -27,8 +27,9 @@ Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[D
    TYPESAFE_API_KEY=... ./server/dev.sh        # API on http://127.0.0.1:8000
    npm --prefix web run dev                     # app on http://localhost:5180, proxies /api
    ```
-   Add `?dev` to the URL to switch between the models the server reports in `/api/health`.
+   Use the Options menu (bottom right) to switch between the models the server reports in `/api/health`.
 5. **Checks:** `npm --prefix web run build` (TypeScript check plus Vite build). There are no automated tests yet.
+6. **Logs:** the server logs its settings at startup (default model, available models, whether the Jev key is set, `ALLOWED_ORIGINS`), one line per reading (model, size, time, answers), and every rejected request or Jev failure with the reason. On Cloudflare the same events are logged as JSON objects (`analyze`, `analyze.rejected`, `jev.error`, `jev.unreachable`, `jev.bad_reply`, `room.connect`, `room.close`, `room.error`); see Workers Logs in the dashboard or `npx wrangler tail`. In the browser, failed model readings and a failed `/api/health` are logged to the console with a `[thaalam]` prefix.
 
 ### Deploy
 
