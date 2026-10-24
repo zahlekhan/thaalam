@@ -118,14 +118,25 @@ export function instrumentFor(r: Reading): Sound {
   return INSTRUMENT[r.role][r.texture]
 }
 
-// The photo's main colour picks its tune: it starts the melody on a different beat
-// (4 choices) and a different note (3 choices), so a red and a green photo with the
-// same reading play different tunes.
+// Melody rhythms by colour family: reds, greens, blues, purples. `_` holds the note.
+const MELODY_RHYTHM = [
+  'x ~ x ~ x ~ x ~ x ~ x ~ x ~ x ~', // steady
+  'x ~ ~ x ~ ~ x ~ ~ x ~ ~ x ~ x ~', // off-beat
+  'x _ _ _ ~ ~ x _ x _ _ _ ~ ~ ~ ~', // long notes
+  'x x ~ x x ~ x ~ x x ~ x ~ x x ~', // quick runs
+]
+
+// The photo's main colour picks its tune. The colour family picks the rhythm; within a
+// family the notes go forwards, backwards, or start higher. The mood still picks the notes.
 function tuneFor(r: Reading, steps: string) {
-  const notes = R(steps).split(' ')
-  const start = (r.pixels.hue % 4) * 4
-  const shift = [0, 2, 4][Math.floor(r.pixels.hue / 4) % 3]
-  return { steps: [...notes.slice(start), ...notes.slice(0, start)].join(' '), shift }
+  let notes = R(steps).split(' ').filter((s) => s !== '~')
+  const turn = r.pixels.hue % 3
+  if (turn === 1) notes = notes.reverse()
+  let i = 0
+  const tune = R(MELODY_RHYTHM[Math.floor(r.pixels.hue / 3)])
+    .split(' ')
+    .map((s) => (s === 'x' ? notes[i++ % notes.length] : s))
+  return { steps: tune.join(' '), shift: turn === 2 ? 2 : 0 }
 }
 
 export function partFor(r: Reading, scale: string): string {

@@ -4,6 +4,14 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T02:13:29+05:30 — Colour picks the melody's rhythm
+
+- Changed: The melody tune from the previous entry was still too close between photos, so colour now changes rhythm, not just start beat and pitch. The colour family (reds, greens, blues, purples) picks one of 4 melody rhythms: steady, off-beat, long notes or quick runs. Within a family the mood's notes play forwards, backwards or two steps higher. Energy and mood still pick the notes.
+- Why: The user listened and said four snack photos still sounded too close.
+- Files: `web/src/music.ts`, `CONTEXT.md`.
+- Validation: `npm --prefix web run build` passes. Generated melodies for 4 hues (one per family) and played each in the app: all sounded, no console errors.
+- Limitations: Not judged by ear yet. Photos whose main colours fall in the same family share a rhythm. Same-role cards still take turns every 2 bars.
+
 ## 2026-10-25T02:06:55+05:30 — Photo colour picks the melody's tune
 
 - Changed: A melody card's main colour (hue bucket, 0 to 11) now picks its tune: it starts the mood's melody on one of 4 beats and shifts it by 0, 2 or 4 scale steps, giving 12 tunes per mood and energy. Before, colour only shifted the melody by 0 or 2 steps.

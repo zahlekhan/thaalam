@@ -41,7 +41,7 @@ With friends:
 | busyness | straight or syncopated variant |
 | brightness | register and filter (dark photos sound darker) |
 | mood | melody shape, plus a vote on the mix's scale |
-| main colour | which beat and note the melody starts on (12 tunes) |
+| main colour | melody rhythm by colour family (steady, off-beat, long notes, quick runs), then forwards, backwards or higher |
 | palette | breaks ties between similar readings |
 
 Mix level:
