@@ -18,6 +18,13 @@ Record each meaningful project change during the event, newest first. Update thi
 - Validation: `npx tsc -b` passed. Checked in headless Chrome at 1280x800 and 390x844 against a stub `/api/health`: the menu opens, lists Jev and vegaml, and "Show code" shows the code panel.
 - Limitations: The model picker is now visible to everyone (no longer behind `?dev`); it is hidden when `/api/health` is unreachable. On narrow phones the code panel still overlaps the wrapped top bar, as before.
 
+## 2026-10-24T22:06:28+05:30 — Take photos with the webcam or phone camera
+
+- Changed: New **Camera** button in the top bar (`web/src/Camera.tsx`, `web/src/App.tsx`, `web/src/styles.css`). It opens a live camera preview with Snap, Flip (front/back) and Cancel; the snapshot becomes a card just like an uploaded photo. Where the live camera API isn't available (plain-http pages), it falls back to a file input with `capture="environment"`, which opens the phone's camera app.
+- Why: Make it easier to add photos from a laptop webcam or phone camera without saving a file first.
+- Validation: `npm --prefix web run build` passed on Node 24. In headless Chrome with a fake camera, opening the camera showed a 1280x1280 stream, Flip switched to the mirrored front view, and Snap closed the modal and added one card that was read and placed on the stage.
+- Limitations: Live preview needs https or localhost (browser rule); opening the dev server from a phone over plain-http LAN uses the camera-app fallback instead. Not tested on a real phone.
+
 ## 2026-10-24T21:44:19+05:30 — Add hackathon documentation
 
 - Changed: Added `README.md`, `AGENTS.md`, `CHANGELOG.md`, `AI_USAGE.md`, `SUBMISSION.md` and `.github/pull_request_template.md` from the hackathon template, filled in from the existing code and `CONTEXT.md`. Entries below are backfilled from git history.
