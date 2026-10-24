@@ -7,7 +7,21 @@ import { YServer } from "y-partyserver";
 
 // One shared canvas per room (/parties/room/<id>). Kept in memory only:
 // photos are not stored after everyone leaves.
-export class Room extends YServer {}
+export class Room extends YServer {
+  onConnect(conn, ctx) {
+    console.log({ event: "room.connect", room: this.name, conn: conn.id });
+    return super.onConnect(conn, ctx);
+  }
+
+  onClose(conn, code, reason, wasClean) {
+    console.log({ event: "room.close", room: this.name, conn: conn.id, code, wasClean });
+    return super.onClose(conn, code, reason, wasClean);
+  }
+
+  onError(conn, error) {
+    console.error({ event: "room.error", room: this.name, conn: conn.id, error: String(error) });
+  }
+}
 
 const JEV_URL = "https://api.typesafe.ai/v1/systemone";
 
@@ -89,6 +103,7 @@ async function analyze(request, env, url) {
   if (request.method !== "POST") return json({ detail: "Method not allowed" }, 405);
   const model = url.searchParams.get("model") ?? "jev";
   if (model !== "jev" || !env.TYPESAFE_API_KEY) {
+    console.warn({ event: "analyze.rejected", reason: "model unavailable", model, jevKey: !!env.TYPESAFE_API_KEY });
     return json({ detail: `${model} isn't available on this server` }, 400);
   }
   let photo;
@@ -98,43 +113,70 @@ async function analyze(request, env, url) {
     return json({ detail: "Expected a multipart photo upload" }, 400);
   }
   if (!(photo instanceof File)) return json({ detail: "No photo in the upload" }, 400);
-  if (photo.size > 15 * 1024 * 1024) return json({ detail: "Photo is too big" }, 413);
+  if (photo.size > 15 * 1024 * 1024) {
+    console.warn({ event: "analyze.rejected", reason: "too big", bytes: photo.size });
+    return json({ detail: "Photo is too big" }, 413);
+  }
 
   // The client already shrinks to JPEG <=512px (reading.ts shrink()), so the
   // bytes go straight to Jev — no server-side image step needed.
   const started = Date.now();
   const ref = crypto.randomUUID();
-  const r = await fetch(JEV_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.TYPESAFE_API_KEY}`,
-      "Content-Type": "application/json",
-      "TypeSafe-Danger-Zone-Images": "true",
-    },
-    body: JSON.stringify({
-      model: env.JEV_MODEL || "jev-latest",
-      state: { photo: ref },
-      assets: {
-        [ref]: { type: "image", format: "jpg", data_base64: base64(await photo.arrayBuffer()) },
+  let r;
+  try {
+    r = await fetch(JEV_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.TYPESAFE_API_KEY}`,
+        "Content-Type": "application/json",
+        "TypeSafe-Danger-Zone-Images": "true",
       },
-      questions: JEV_QUESTIONS,
-    }),
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!r.ok) return json({ detail: `Jev said ${r.status}: ${(await r.text()).slice(0, 200)}` }, 502);
+      body: JSON.stringify({
+        model: env.JEV_MODEL || "jev-latest",
+        state: { photo: ref },
+        assets: {
+          [ref]: { type: "image", format: "jpg", data_base64: base64(await photo.arrayBuffer()) },
+        },
+        questions: JEV_QUESTIONS,
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (e) {
+    console.error({ event: "jev.unreachable", error: String(e), ms: Date.now() - started });
+    return json({ detail: `Couldn't reach Jev: ${e.name}` }, 502);
+  }
+  if (!r.ok) {
+    const body = (await r.text()).slice(0, 500);
+    console.warn({ event: "jev.error", status: r.status, body, ms: Date.now() - started });
+    return json({ detail: `Jev said ${r.status}: ${body.slice(0, 200)}` }, 502);
+  }
 
-  const out = (await r.json()).answers;
-  const answers = Object.fromEntries(
-    Object.entries(out).map(([q, a]) => [
-      q,
-      {
-        choice: a.choice,
-        prob: a.probabilities[a.choice],
-        unsure: (a.confidence ?? 1) < 0.35,
-      },
-    ])
-  );
-  return json({ model: "jev", ms: Date.now() - started, answers });
+  const text = await r.text();
+  let answers;
+  try {
+    answers = Object.fromEntries(
+      Object.entries(JSON.parse(text).answers).map(([q, a]) => [
+        q,
+        {
+          choice: a.choice,
+          prob: a.probabilities[a.choice],
+          unsure: (a.confidence ?? 1) < 0.35,
+        },
+      ])
+    );
+  } catch (e) {
+    console.error({ event: "jev.bad_reply", error: String(e), body: text.slice(0, 500) });
+    return json({ detail: "Jev sent an unexpected reply" }, 502);
+  }
+  const ms = Date.now() - started;
+  console.log({
+    event: "analyze",
+    model: "jev",
+    bytes: photo.size,
+    ms,
+    ...Object.fromEntries(Object.entries(answers).map(([q, a]) => [q, a.choice])),
+  });
+  return json({ model: "jev", ms, answers });
 }
 
 export default {

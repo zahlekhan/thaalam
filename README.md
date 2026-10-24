@@ -29,6 +29,7 @@ Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[D
    ```
    Use the Options menu (bottom right) to switch between the models the server reports in `/api/health`.
 5. **Checks:** `npm --prefix web run build` (TypeScript check plus Vite build). There are no automated tests yet.
+6. **Logs:** the server logs its settings at startup (default model, available models, whether the Jev key is set, `ALLOWED_ORIGINS`), one line per reading (model, size, time, answers), and every rejected request or Jev failure with the reason. On Cloudflare the same events are logged as JSON objects (`analyze`, `analyze.rejected`, `jev.error`, `jev.unreachable`, `jev.bad_reply`, `room.connect`, `room.close`, `room.error`); see Workers Logs in the dashboard or `npx wrangler tail`. In the browser, failed model readings and a failed `/api/health` are logged to the console with a `[thaalam]` prefix.
 
 ### Deploy
 
@@ -38,7 +39,7 @@ Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[D
 ### Current status
 
 - **Working features:** tldraw canvas with a stage frame; drop, paste or upload photos to make cards; cards on the stage play and cards off it stay silent; a mix of tempo, scale and parts across all stage cards; a tray of 6 sample photos with precomputed Jev readings; an Options menu (bottom right) with a code view showing the generated Strudel pattern and a model picker; local FastAPI server and hosted Cloudflare Worker.
-- **Known limitations:** Rooms (multiplayer) are not built yet. vegaml is local-only and is not available on Cloudflare. The key is fixed and all cards play at the same volume. If the model call fails, a card plays from pixel measurements alone. tldraw shows its SDK license watermark. `server/dev.sh` falls back to reading the key from `../../seefood/.dev.vars`.
+- **Known limitations:** Rooms (multiplayer) are not built yet. vegaml is local-only and is not available on Cloudflare. The key is fixed and all cards play at the same volume. If the model call fails, a card plays from pixel measurements alone and says "Can't reach the model". tldraw shows its SDK license watermark. `server/dev.sh` falls back to reading the key from `../../seefood/.dev.vars`.
 - **Libraries, APIs, and public datasets used:** [tldraw](https://tldraw.dev) (SDK license, watermark on free use), [Strudel](https://strudel.cc) (`@strudel/web`, `@strudel/soundfonts`, AGPL-3.0), [React](https://react.dev), [Vite](https://vite.dev), [FastAPI](https://fastapi.tiangolo.com), [Pillow](https://python-pillow.org), [httpx](https://www.python-httpx.org), [Jev / TypeSafe API](https://typesafe.ai), vegaml (local open model, Apache 2.0), [Cloudflare Workers](https://developers.cloudflare.com/workers/). Sample photos are from Unsplash under the Unsplash License; see [web/public/samples/CREDITS.md](web/public/samples/CREDITS.md).
 
 See [AI_USAGE.md](AI_USAGE.md) for AI assistance and [CHANGELOG.md](CHANGELOG.md) for the development record.
