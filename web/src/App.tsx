@@ -13,6 +13,7 @@ import {
   createRoom,
   getName,
   joinRoom,
+  newRoomId,
   onPeers,
   peerNames,
   pendingPhotos,
@@ -434,7 +435,7 @@ function usePeers() {
   return { names: Array.from(names.values()), room, setRoom }
 }
 
-type Sheet = null | 'add' | 'invite' | 'share' | 'more' | 'code'
+type Sheet = null | 'add' | 'invite' | 'share' | 'more' | 'code' | 'newroom'
 
 function BottomBar({
   soundState,
@@ -535,12 +536,14 @@ function BottomBar({
           onClose={close}
           onInvite={showInvite ? undefined : () => setSheet('invite')}
           onShare={showShare || !hasPhotos ? undefined : () => setSheet('share')}
+          onNewRoom={() => setSheet('newroom')}
         />
       )}
       {sheet === 'add' && <AddSheet onClose={close} onFiles={onFiles} onSample={onSample} />}
       {sheet === 'invite' && <InviteSheet onClose={close} peers={peers} />}
       {sheet === 'share' && <ShareSheet onClose={close} peers={peers} />}
       {sheet === 'code' && <CodeSheet onClose={close} />}
+      {sheet === 'newroom' && <NewRoomSheet onClose={close} />}
     </>
   )
 }
@@ -790,7 +793,17 @@ function ShareSheet({ onClose, peers }: { onClose: () => void; peers: ReturnType
 }
 
 // Invite and Share live here until the bar has room for them (see BottomBar).
-function MoreMenu({ onClose, onInvite, onShare }: { onClose: () => void; onInvite?: () => void; onShare?: () => void }) {
+function MoreMenu({
+  onClose,
+  onInvite,
+  onShare,
+  onNewRoom,
+}: {
+  onClose: () => void
+  onInvite?: () => void
+  onShare?: () => void
+  onNewRoom: () => void
+}) {
   const [models, setModels] = useState<string[]>([])
   const [model, setModel] = useState(currentModel)
   useEffect(() => {
@@ -828,6 +841,10 @@ function MoreMenu({ onClose, onInvite, onShare }: { onClose: () => void; onInvit
           <GalleryIcon size={20} />
           Public gallery
         </a>
+        <button role="menuitem" onClick={onNewRoom}>
+          <PlusIcon size={20} />
+          New room
+        </button>
         {DEV && (
           <label className="model">
             Model
@@ -842,6 +859,27 @@ function MoreMenu({ onClose, onInvite, onShare }: { onClose: () => void; onInvit
         )}
       </div>
     </>
+  )
+}
+
+// New room = a fresh empty fridge at a new link. Confirm first so nobody loses this canvas by a stray tap.
+function NewRoomSheet({ onClose }: { onClose: () => void }) {
+  return (
+    <SheetFrame title="Start a new room?" onClose={onClose}>
+      <p className="hint">
+        You'll get a fresh empty fridge at a new link. This canvas isn't deleted — it stays at its
+        current link for anyone who has it.
+      </p>
+      <div className="row">
+        <button className="primary-btn" onClick={() => (location.href = `/?room=${newRoomId()}`)}>
+          <PlusIcon size={20} />
+          New room
+        </button>
+        <button className="text-btn" onClick={onClose}>
+          Stay here
+        </button>
+      </div>
+    </SheetFrame>
   )
 }
 

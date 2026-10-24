@@ -60,8 +60,10 @@ export function joinRoom(room: string) {
   return provider
 }
 
+export const newRoomId = () => Math.random().toString(36).slice(2, 8)
+
 export function createRoom() {
-  const room = Math.random().toString(36).slice(2, 8)
+  const room = newRoomId()
   const url = new URL(location.href)
   url.searchParams.set('room', room)
   history.replaceState(null, '', url)
