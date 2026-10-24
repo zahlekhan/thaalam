@@ -10,6 +10,9 @@ Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[D
 - **Short description:** Each photo becomes a card that plays one part of a loop (kick, percussion, bass, chords, melody or texture). A vision model reads the photo's mood, energy, texture, role and gist; the browser turns that reading plus pixel measurements, including the colour field, into a Strudel pattern. Photos are stuck on a shared "fridge door" canvas, scattered wherever people drop them; every card plays unless someone mutes it. It's a playful way for anyone, musician or not, to make an original loop from their own photos.
 - **Team:** zahle khan
 - **Working demo:** [Link](https://thaalam.theotherkhan271.workers.dev/)
+- **Video:** [thaalam-demo.mp4](thaalam-demo.mp4)
+
+<video src="thaalam-demo.mp4" controls></video>
 - **Technology stack:** React 19, TypeScript, Vite 8, React Flow (`@xyflow/react`), Yjs rooms, Strudel (`@strudel/web`) in `web/`; Python FastAPI in `server/` (local); Cloudflare Worker in `worker/` (hosted); Jev (TypeSafe) and vegaml vision models.
 
 ### Run the project
