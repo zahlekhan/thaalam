@@ -25,7 +25,7 @@ Participate solo or in a team of up to 4. Remove unused rows.
 - **Install command:** `npm --prefix web ci` and `pip install -r server/requirements.txt` (in a venv at `server/.venv-lite`).
 - **Required environment variable names:** `TYPESAFE_API_KEY`. Optional: `THAALAM_PROVIDER`, `JEV_MODEL`, `ALLOWED_ORIGINS`, `VITE_API_URL`.
 - **Start command:** `./server/dev.sh` and `npm --prefix web run dev` (local), or `npm run deploy` (Cloudflare Workers).
-- **Demo walkthrough:** Tap "Start jamming", then "Add photo" and pick a sample to hear its part. Add more samples or drop your own photos and the loop grows. Tap a card to mute or delete it (Undo brings it back). Tap "Invite" to open a room and show the QR code to a friend. Open the "⋯" menu and "See the code" for the generated Strudel pattern.
+- **Demo walkthrough:** Tap "Start jamming", then "Add photo" and pick a sample to hear its part. Add more samples or drop your own photos and the loop grows. Tap a card to mute or delete it (Undo brings it back). Tap "Invite" to open a room and show the QR code to a friend. Tap "Share" to list the canvas in the public gallery. Open the "⋯" menu and "See the code" for the generated Strudel pattern.
 - **Checks performed and results:** `npm --prefix web run build` passes. No automated tests.
 - **Known limitations or incomplete features:** Timing is not synced across devices; vegaml is local-only; fixed key; equal volume for all cards. See [README.md](README.md#current-status).
 - **Libraries, APIs, and public datasets used:** See [README.md](README.md#current-status) and [web/public/samples/CREDITS.md](web/public/samples/CREDITS.md).

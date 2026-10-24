@@ -464,7 +464,7 @@ function BottomBar({
         ) : (
           <button className="bar-btn" onClick={() => setSheet('add')}>
             <PlusIcon size={20} />
-            Add<span className="wide-only">&nbsp;photo</span>
+            Add<span className="wide-only">photo</span>
           </button>
         )}
         {!VIEW_ONLY && (
@@ -669,9 +669,7 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
           <li key={i}>{n}</li>
         ))}
       </ul>
-      <p className="hint">
-        Only people with the link can find this canvas. To let anyone open it, use Share.
-      </p>
+      <p className="hint after-people">Only people with the link can find this canvas. To let anyone look and listen, use Share.</p>
     </SheetFrame>
   )
 }
@@ -987,7 +985,7 @@ function GalleryPage() {
         </a>
       </header>
       <h1>Public gallery</h1>
-      <p className="lede">Canvases people chose to share. Open one to hear it and add your own photos.</p>
+      <p className="lede">Canvases people chose to share. Open one to look around and listen.</p>
       {rooms === null ? (
         <p className="gallery-empty">Loading the gallery…</p>
       ) : failed ? (

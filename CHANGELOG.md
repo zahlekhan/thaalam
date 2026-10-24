@@ -4,6 +4,14 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T00:59:00+05:30 — Share gets its own button; start sheet previews the gallery
+
+- Changed: Listing a canvas in the public gallery moved out of the Invite sheet into its own "Share" button and sheet (optional name, view-only explanation, "Share publicly", or "See the gallery" / "Remove from gallery" once listed). Invite now only covers the private link, QR code and who's here, with a note pointing to Share. Sharing an empty canvas is blocked with "Add a photo first". The start sheet for a new canvas shows up to three shared canvases as small fridge doors with "See all"; they open view-only. On phones the bar reads "Add · Invite · Share". `useGallery()` and `FridgeTile` are shared by the gallery page and the preview.
+- Why: Inviting friends (private) and posting publicly were one sheet, so public sharing was hard to find and easy to confuse with inviting. First-time visitors had no way to hear what the app makes before starting.
+- Files: `web/src/App.tsx`, `web/src/styles.css`. Most of this landed in commit `230b49c`, made by a parallel Devin session working in the same checkout; this entry describes it.
+- Validation: `tsc --noEmit` passes; local `wrangler dev` build captured in headless Chrome at 375×812 and 1280×800: start sheet with preview, preview tile opens `?room=…&view=1`, Share sheet (empty, listed), Invite sheet, bottom bar fits on phone.
+- Limitations: The preview is hidden when the gallery is empty or unreachable. Only checked locally with one listed canvas, not on the deployed site.
+
 ## 2026-10-25T00:45:00+05:30 — Public gallery opens canvases view-only
 
 - Changed: Gallery cards link to `/?room=<id>&view=1`. View mode joins the room straight away (no join sheet), keeps pan, zoom and play/stop, and hides editing: no drag, select, mute, delete, add, invite or share controls, plus a "View only" note and a "Make your own" link in the bar. Share/publish copy now says visitors can look and listen, not add photos.

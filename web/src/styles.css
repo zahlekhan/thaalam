@@ -718,6 +718,9 @@ p {
   font-size: 14px;
   font-weight: 500;
 }
+.after-people {
+  margin-top: calc(var(--u) * 2);
+}
 .people .me {
   background: var(--enamel);
 }
