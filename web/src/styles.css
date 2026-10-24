@@ -190,3 +190,60 @@ body,
   padding: 0 6px;
   white-space: nowrap;
 }
+.camera {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+.camera-box {
+  background: #111;
+  border-radius: 18px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 94vw;
+}
+.camera video {
+  display: block;
+  width: min(640px, 90vw);
+  max-height: 70vh;
+  border-radius: 12px;
+  background: #000;
+  object-fit: cover;
+}
+.camera video.mirror {
+  transform: scaleX(-1);
+}
+.camera-error {
+  color: #fff;
+  max-width: 320px;
+  margin: 24px 12px;
+  line-height: 1.4;
+}
+.camera-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.camera-actions button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 15px;
+  background: #eee;
+  cursor: pointer;
+}
+.camera-actions button.primary {
+  background: #ff6a3d;
+  color: #fff;
+  font-weight: 600;
+}
+.camera-actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

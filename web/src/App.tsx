@@ -11,6 +11,7 @@ import { CARD_H, CARD_W, Card, Stage, readingOf, type CardNode, type StageNode }
 import { API_URL, askModel, measurePixels, shrink, type ModelReading } from './reading'
 import { mixFor } from './music'
 import { play, startSound } from './sound'
+import { Camera, hasLiveCamera } from './Camera'
 import { cards, createRoom, doc, joinRoom, onPeers, peerCount, photos, roomFromUrl, type CardData } from './room'
 
 const STAGE_W = 1120
@@ -224,7 +225,9 @@ function Overlay() {
   const [samples, setSamples] = useState<Sample[]>([])
   const [models, setModels] = useState<string[]>([])
   const [model, setModel] = useState(currentModel)
+  const [camera, setCamera] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const captureRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetch('/samples/samples.json')
@@ -277,6 +280,7 @@ function Overlay() {
           <button className="primary" onClick={start}>Tap to start sound</button>
         )}
         <button onClick={() => fileRef.current?.click()}>Add photo</button>
+        <button onClick={() => (hasLiveCamera() ? setCamera(true) : captureRef.current?.click())}>Camera</button>
         <button onClick={invite} title={room ? `Room ${room}` : 'Create a room and copy its link'}>
           {copied ? 'Link copied' : room ? `Room · ${n} here` : 'Invite friends'}
         </button>
@@ -301,7 +305,29 @@ function Overlay() {
             e.target.value = ''
           }}
         />
+        <input
+          ref={captureRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          onChange={async (e) => {
+            const f = e.target.files?.[0]
+            if (f) addCard(await shrink(f), null)
+            e.target.value = ''
+          }}
+        />
       </div>
+
+      {camera && (
+        <Camera
+          onClose={() => setCamera(false)}
+          onShot={async (photo) => {
+            setCamera(false)
+            addCard(await shrink(photo), null)
+          }}
+        />
+      )}
 
       {showCode && <pre className="code">{m.code || '// nothing on the stage yet'}</pre>}
 
