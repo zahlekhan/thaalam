@@ -91,7 +91,7 @@ async function addCard(src: string, model: ModelReading | null, at?: { x: number
     const m = model ?? (await askModel(src, currentModel))
     update({ model: JSON.stringify(m), status: 'ready' })
   } catch (e) {
-    console.warn(e)
+    console.warn('[thaalam] model reading failed, using pixels only:', e)
     update({ status: 'ready' }) // pixels alone still make a part
   }
 }
@@ -233,15 +233,24 @@ function Overlay() {
     fetch('/samples/samples.json')
       .then((r) => (r.ok ? r.json() : []))
       .then(setSamples)
-      .catch(() => setSamples([]))
+      .catch((e) => {
+        console.warn('[thaalam] could not load samples:', e)
+        setSamples([])
+      })
     fetch(`${API_URL}/api/health`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`)
+        return r.json()
+      })
       .then((h: { default: string; models: string[] }) => {
         setModels(h.models)
         // Fall back to the server's default if the saved choice isn't available here.
         if (!h.models.includes(currentModel)) pickModel(h.default)
       })
-      .catch(() => setModels([]))
+      .catch((e) => {
+        console.warn(`[thaalam] backend health check failed (${API_URL || 'same origin'}/api/health):`, e)
+        setModels([])
+      })
   }, [])
 
   const pickModel = (m: string) => {

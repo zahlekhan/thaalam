@@ -32,7 +32,7 @@ export const Card = memo(function Card({ data }: NodeProps<CardNode>) {
   const inst = reading ? instrumentFor(reading) : null
 
   let line = 'Listening...'
-  if (data.status === 'error') line = "Can't reach the model"
+  if (reading && !data.model) line = "Can't reach the model"
   else if (reading?.guessed) line = `${reading.mood}, a guess`
   else if (reading) line = `${reading.mood} ${Math.round(reading.moodProb * 100)}%`
 

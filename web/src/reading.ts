@@ -137,6 +137,9 @@ export async function askModel(src: string, model: string): Promise<ModelReading
   const form = new FormData()
   form.append('photo', blob, 'photo.jpg')
   const r = await fetch(`${API_URL}/api/analyze?model=${encodeURIComponent(model)}`, { method: 'POST', body: form })
-  if (!r.ok) throw new Error(`analyze failed: ${r.status}`)
+  if (!r.ok) {
+    const detail = await r.json().then((b) => b.detail, () => r.statusText)
+    throw new Error(`analyze failed (${model}): ${r.status} ${detail}`)
+  }
   return r.json()
 }
