@@ -69,11 +69,14 @@ Success means a group goes from opening a shared link to hearing a loop made fro
 - Rooms sync with Yjs on a Cloudflare Durable Object (`worker/index.js`). The hosted app is one Cloudflare Worker on a single origin.
 - Readings come from two providers behind one question set: Jev (TypeSafe hosted API, the default) and vegaml (a local open model, available only on a laptop, not on Cloudflare).
 
+**Decided, not yet fully built** (decided by the user on 2026-10-24):
+
+- **Replacing the stage.** The user chose to remove the stage frame and parking. The current code still uses them, and the redesign will replace them with the scattered canvas and the mute and delete actions described above.
+- **Canvases are kept permanently.** Rooms and their photos don't expire (photos are stored in R2). A canvas appears in the public gallery at `/gallery` only when someone in the room chooses to publish it.
+- **Names in rooms.** People joining a room can enter a name, or get a random one if they don't. Names are shown to others in the room (for example when someone joins). There are no accounts.
+
 **Open decisions** (not settled; don't present them as settled):
 
-- **Replacing the stage (decided 2026-10-24, not yet built).** The user chose to remove the stage frame and parking. The current code still uses them, and the redesign will replace them with the scattered canvas and the mute and delete actions described above.
-
-- **Photo and room retention, and the public gallery.** As of 2026-10-24 this was changing in the uncommitted working tree: rooms that expire after 2 hours were being replaced by permanent canvases, photos stored in R2, and an opt-in public gallery at `/gallery`. Treat the current code and the first-run notice as the source of truth.
 - Key choice (fixed for now), per-card volume (there is no control for it yet), and cross-device timing sync.
 - No accessibility standard has been set.
 

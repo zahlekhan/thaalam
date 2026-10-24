@@ -52,6 +52,17 @@ export class Room extends YServer {
       if (typeof src === "string" && src.startsWith("/photos/")) previews.push(src);
       if (previews.length >= 4) break;
     }
+    // Who made it and how it feels, so the gallery can title it with something human.
+    const names = new Set();
+    const moods = {};
+    for (const card of this.document.getMap("cards").values()) {
+      if (card?.by) names.add(card.by);
+      try {
+        const mood = card?.model && JSON.parse(card.model).answers?.mood?.choice;
+        if (mood) moods[mood] = (moods[mood] ?? 0) + 1;
+      } catch {}
+    }
+    const mood = Object.entries(moods).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
     await galleryStub(this.env).fetch(
       new Request("https://gallery/upsert", {
         method: "POST",
@@ -59,6 +70,8 @@ export class Room extends YServer {
           room: this.name,
           cards: this.document.getMap("cards").size,
           previews,
+          names: [...names].slice(0, 3),
+          mood,
           at: Date.now(),
         }),
       })
@@ -72,6 +85,14 @@ export class Gallery extends Server {
     this.ctx.storage.sql.exec(
       "CREATE TABLE IF NOT EXISTS rooms (room TEXT PRIMARY KEY, at INTEGER NOT NULL, cards INTEGER NOT NULL, previews TEXT NOT NULL)"
     );
+    // Added later: who made the canvas and its mood. Older tables get the columns here.
+    for (const col of ["names TEXT NOT NULL DEFAULT '[]'", "mood TEXT NOT NULL DEFAULT ''"]) {
+      try {
+        this.ctx.storage.sql.exec(`ALTER TABLE rooms ADD COLUMN ${col}`);
+      } catch {
+        // Column already exists.
+      }
+    }
   }
 
   async onRequest(request) {
@@ -81,20 +102,23 @@ export class Gallery extends Server {
         this.ctx.storage.sql.exec("DELETE FROM rooms WHERE room = ?", body.room);
       } else {
         this.ctx.storage.sql.exec(
-          "INSERT INTO rooms (room, at, cards, previews) VALUES (?, ?, ?, ?) " +
-            "ON CONFLICT(room) DO UPDATE SET at = excluded.at, cards = excluded.cards, previews = excluded.previews",
+          "INSERT INTO rooms (room, at, cards, previews, names, mood) VALUES (?, ?, ?, ?, ?, ?) " +
+            "ON CONFLICT(room) DO UPDATE SET at = excluded.at, cards = excluded.cards, previews = excluded.previews, " +
+            "names = excluded.names, mood = excluded.mood",
           body.room,
           body.at ?? Date.now(),
           body.cards ?? 0,
-          JSON.stringify(body.previews ?? [])
+          JSON.stringify(body.previews ?? []),
+          JSON.stringify(body.names ?? []),
+          body.mood ?? ""
         );
       }
       return json({ ok: true });
     }
     const rows = this.ctx.storage.sql
-      .exec("SELECT room, at, cards, previews FROM rooms ORDER BY at DESC LIMIT 200")
+      .exec("SELECT room, at, cards, previews, names, mood FROM rooms ORDER BY at DESC LIMIT 200")
       .toArray();
-    return json({ rooms: rows.map((r) => ({ ...r, previews: JSON.parse(r.previews) })) });
+    return json({ rooms: rows.map((r) => ({ ...r, previews: JSON.parse(r.previews), names: JSON.parse(r.names) })) });
   }
 }
 

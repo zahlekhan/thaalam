@@ -5,11 +5,11 @@ Complete this file during the hackathon and use it to prepare your submission th
 ## Project
 
 - **Project name:** Thaalam
-- **Short description:** Photos become cards that each play one part of an original music loop. A vision model reads each photo's mood, energy, texture and role, and the browser turns the readings into a Strudel loop. Anyone can make music by arranging photos on a stage.
+- **Short description:** Photos become cards that each play one part of an original music loop. A vision model reads each photo's mood, energy, texture and role, and the browser turns the readings into a Strudel loop. Anyone can make music by sticking photos on a shared fridge-door canvas, alone or with friends in a room.
 - **Code repository URL:** https://github.com/zahlekhan/thaalam
 - **Final submitted implementation commit SHA:** TODO
 - **Working demo URL or local demo steps:** TODO — deployed URL. Local steps are in [README.md](README.md#run-the-project).
-- **Demo access requirements:** A browser with audio. Tap "Tap to start sound" first. No account is needed for the hosted demo; local runs need a Jev API key in `TYPESAFE_API_KEY`.
+- **Demo access requirements:** A browser with audio. Type a name (or keep the random one) and tap "Start jamming" or "Join the jam" to turn on sound. No account is needed for the hosted demo; local runs need a Jev API key in `TYPESAFE_API_KEY`.
 
 ## Participants
 
@@ -25,9 +25,9 @@ Participate solo or in a team of up to 4. Remove unused rows.
 - **Install command:** `npm --prefix web ci` and `pip install -r server/requirements.txt` (in a venv at `server/.venv-lite`).
 - **Required environment variable names:** `TYPESAFE_API_KEY`. Optional: `THAALAM_PROVIDER`, `JEV_MODEL`, `ALLOWED_ORIGINS`, `VITE_API_URL`.
 - **Start command:** `./server/dev.sh` and `npm --prefix web run dev` (local), or `npm run deploy` (Cloudflare Workers).
-- **Demo walkthrough:** Tap to start sound, then add a sample photo from the tray and hear its part. Add more samples or drop your own photos onto the stage and the loop grows. Drag a card off the stage to mute it. Open "Code" to see the generated Strudel pattern.
+- **Demo walkthrough:** Tap "Start jamming", then "Add photo" and pick a sample to hear its part. Add more samples or drop your own photos and the loop grows. Tap a card to mute or delete it (Undo brings it back). Tap "Invite" to open a room and show the QR code to a friend. Open the "⋯" menu and "See the code" for the generated Strudel pattern.
 - **Checks performed and results:** `npm --prefix web run build` passes. No automated tests.
-- **Known limitations or incomplete features:** Rooms (multiplayer) not built; vegaml is local-only; fixed key; equal volume for all cards. See [README.md](README.md#current-status).
+- **Known limitations or incomplete features:** Timing is not synced across devices; vegaml is local-only; fixed key; equal volume for all cards. See [README.md](README.md#current-status).
 - **Libraries, APIs, and public datasets used:** See [README.md](README.md#current-status) and [web/public/samples/CREDITS.md](web/public/samples/CREDITS.md).
 - **AI usage record:** [AI_USAGE.md](AI_USAGE.md)
 - **Development change log:** [CHANGELOG.md](CHANGELOG.md)

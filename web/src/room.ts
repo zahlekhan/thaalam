@@ -11,6 +11,9 @@ export type CardData = {
   status: string // 'reading' | 'ready' | 'error'
   model: string // JSON ModelReading, '' until read
   pixels: string // JSON Pixels, '' until measured
+  muted?: boolean // stays on the canvas but silent
+  rot?: number // tilt in degrees, so the canvas looks like photos stuck up by hand
+  by?: string // name of whoever added it
 }
 
 export const doc = new Y.Doc()
@@ -27,6 +30,23 @@ export const roomFromUrl = () => new URLSearchParams(location.search).get('room'
 
 let provider: YProvider | null = null
 
+// Your display name. Typed on join, or a random one; shared with the room.
+const ADJECTIVES = ['Mango', 'Neon', 'Sleepy', 'Disco', 'Velvet', 'Turbo', 'Sunny', 'Fuzzy', 'Cosmic', 'Pepper', 'Lucky', 'Breezy']
+const THINGS = ['Tabla', 'Kazoo', 'Banjo', 'Bongo', 'Cowbell', 'Ukulele', 'Maraca', 'Tuba', 'Flute', 'Gong', 'Sitar', 'Drum']
+const pick = (xs: string[]) => xs[Math.floor(Math.random() * xs.length)]
+export const randomName = () => `${pick(ADJECTIVES)} ${pick(THINGS)}`
+
+let myName = localStorage.getItem('thaalam-name') ?? ''
+export const getName = () => myName
+let joined = false
+export function setName(name: string) {
+  joined = true
+  myName = name.trim().slice(0, 24) || randomName()
+  localStorage.setItem('thaalam-name', myName)
+  provider?.awareness.setLocalStateField('user', { name: myName })
+  return myName
+}
+
 export function joinRoom(room: string) {
   if (provider) return provider
   const base = new URL(API_URL || location.origin)
@@ -34,6 +54,9 @@ export function joinRoom(room: string) {
     party: 'room',
     protocol: base.protocol === 'https:' ? 'wss' : 'ws',
   })
+  // Your name reaches the room when you join from the join screen (setName), not before.
+  if (joined) provider.awareness.setLocalStateField('user', { name: myName })
+  localStorage.setItem('thaalam-last-room', room)
   return provider
 }
 
@@ -49,6 +72,17 @@ export function createRoom() {
 // How many people are in the room, including you.
 export function peerCount() {
   return provider ? provider.awareness.getStates().size : 1
+}
+// Names of everyone else in the room, keyed by their connection.
+export function peerNames(): Map<number, string> {
+  const out = new Map<number, string>()
+  if (!provider) return out
+  for (const [client, state] of provider.awareness.getStates()) {
+    if (client === provider.awareness.clientID) continue
+    const name = (state as { user?: { name?: string } }).user?.name
+    out.set(client, name || 'Someone')
+  }
+  return out
 }
 export function onPeers(cb: () => void) {
   if (!provider) return () => {}

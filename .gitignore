@@ -9,3 +9,5 @@ web/public/test/
 *.tsbuildinfo
 *.tsbuildinfo
 .wrangler/
+.dev.vars
+.env

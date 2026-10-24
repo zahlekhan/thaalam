@@ -1,4 +1,4 @@
-// Strudel setup plus the "pulse the card on its own notes" hook.
+// Strudel setup plus the "bounce the card's magnet on its own notes" hook.
 
 import { initStrudel, samples, evaluate, hush } from '@strudel/web'
 import { registerSoundfonts } from '@strudel/soundfonts'
@@ -12,16 +12,19 @@ export function startSound() {
   return ready
 }
 
-// Strudel calls this a little before each note. Wait until the note actually sounds, then pulse.
+const still = matchMedia('(prefers-reduced-motion: reduce)')
+
+// Strudel calls this a little before each note. Wait until the note actually sounds, then bounce.
 ;(window as any).hit = (id: string) => (_hap: unknown, now: number, _cps: number, target: number) => {
+  if (still.matches) return
   setTimeout(() => {
-    const el = document.querySelector(`[data-card="${id}"]`) as HTMLElement | null
+    const el = document.querySelector(`[data-magnet="${id}"]`) as HTMLElement | null
     el?.animate(
       [
-        { transform: 'scale(1.045)', boxShadow: '0 0 0 4px var(--glow), 0 0 42px 6px var(--glow)' },
-        { transform: 'scale(1)', boxShadow: '0 0 0 2px var(--glow), 0 0 18px 0 var(--glow)' },
+        { transform: 'translateY(-5px) scale(1.14)' },
+        { transform: 'translateY(0) scale(1)' },
       ],
-      { duration: 220, easing: 'ease-out' },
+      { duration: 240, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
     )
   }, Math.max(0, (target - now) * 1000))
 }
@@ -33,4 +36,9 @@ export async function play(code: string) {
   await startSound()
   if (!code) hush()
   else await evaluate(code)
+}
+
+export function stopSound() {
+  last = ''
+  hush()
 }
