@@ -11,3 +11,5 @@ web/public/test/
 .wrangler/
 .dev.vars
 .env
+.claude/
+.impeccable/
