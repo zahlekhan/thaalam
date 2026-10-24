@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T01:46:00+05:30 — 3D fridge intro on the join screen
+
+- Changed: New `web/src/FridgeIntro.tsx` draws a 3D fridge with Three.js behind the join sheet, wearing the room's real photos and magnets in their canvas layout. On join the camera flies into the door and fades onto the canvas. It loads as a separate chunk (about 138 KB gzipped), so the join sheet never waits; joining before it loads skips it. Colours come from the CSS tokens. `App.tsx` mounts it, `styles.css` clears the join backdrop and moves the sheet left on wide screens while the fridge shows. Added `three` and `@types/three`.
+- Why: The user asked for a 3D fridge zoom after entering a name; it makes the fridge-door idea literal for the first moment.
+- Validation: `tsc -b` and `vite build` pass. Headless Chrome at 1280x800 and 390x844: fridge idles beside or behind the sheet, flight frames captured, the room's 5 photos appear on the door and match the canvas after the flight, the intro is removed afterwards; under emulated reduced motion it disappears straight away; `?view=1` never shows it.
+- Limitations: Not tested on a real phone GPU or Safari. Plays on every join, not just the first. Cards are capped at 12 on the door.
+
 ## 2026-10-25T01:45:00+05:30 — The control bar grows one next step at a time
 
 - Changed: The bottom bar now follows the canvas instead of showing every action at once. Empty fridge: Play, a wide Go Red "Add photo" and More; Play turns Mint Wash while stopped so Add photo is the only red. First photo: Invite appears in Invite Blue as the next step and Add photo turns neutral. Once the canvas has a room (you opened Invite, or came in through a link): Invite turns neutral with its "· N here" count and Share appears, also neutral. Steps not yet in the bar sit at the top of the More menu ("Invite friends", "Share in the public gallery"), so nothing is unreachable. New buttons pop into the bar (none under reduced motion). The stage is worked out from the photo count and whether a room exists, so there is nothing new to store. Files: `web/src/App.tsx` (`BottomBar`, `MoreMenu`), `web/src/styles.css`, `DESIGN.md`, `README.md`.

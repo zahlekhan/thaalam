@@ -851,6 +851,30 @@ p {
 
 /* ---------- Join ---------- */
 
+/* The 3D fridge stands behind the join sheet, then the camera flies into its door. */
+.fridge-intro {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9;
+  transition: opacity 0.35s ease-out;
+}
+.fridge-intro.leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+.has-fridge .sheet-backdrop.join {
+  background: none;
+  backdrop-filter: none;
+}
+@media (min-width: 900px) {
+  .has-fridge .sheet-backdrop.join {
+    justify-content: flex-start;
+    padding-left: max(6vw, calc(var(--u) * 4));
+  }
+}
+
 .sheet-backdrop.join {
   background: rgba(205, 239, 224, 0.72);
   backdrop-filter: blur(6px);

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { ReactFlow, ReactFlowProvider, applyNodeChanges, useReactFlow, type NodeChange } from '@xyflow/react'
 import qrcode from 'qrcode-generator'
 import { CARD_H, CARD_W, Card, describe, type CardNode } from './CardShape'
@@ -7,6 +7,7 @@ import { mixFor } from './music'
 import { play, startSound, stopSound } from './sound'
 import { addCard, playingCards, removeCards, toggleMute } from './canvas'
 import { Camera, hasLiveCamera } from './Camera'
+
 import {
   cards,
   createRoom,
@@ -38,6 +39,9 @@ import {
   PlusIcon,
   StopIcon,
 } from './icons'
+
+// Three.js arrives in its own chunk, after the join sheet is already usable.
+const FridgeIntro = lazy(() => import('./FridgeIntro'))
 
 type Sample = {
   file: string
@@ -111,6 +115,8 @@ function Board() {
   const [nodes, setNodes] = useState<CardNode[]>(() => nodesFromDoc([]))
   const soundState = useSound()
   const [joined, setJoined] = useState(VIEW_ONLY)
+  // The 3D fridge: 'off' once gone, 'loading' until its first frame, then 'shown'.
+  const [fridge, setFridge] = useState<'loading' | 'shown' | 'off'>(VIEW_ONLY ? 'off' : 'loading')
   const fitted = useRef(false)
   const m = useMix()
 
@@ -261,7 +267,7 @@ function Board() {
 
   return (
     <div
-      className={`app${nodes.some((n) => n.selected) ? ' has-selection' : ''}`}
+      className={`app${nodes.some((n) => n.selected) ? ' has-selection' : ''}${fridge === 'shown' ? ' has-fridge' : ''}`}
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault()
@@ -289,6 +295,11 @@ function Board() {
       <BottomBar soundState={soundState} onToggleSound={toggleSound} onFiles={addFiles} onSample={addSample} />
       {m.total === 0 && joined && !VIEW_ONLY && <EmptyHint />}
       <ToastView />
+      {fridge !== 'off' && (
+        <Suspense fallback={null}>
+          <FridgeIntro fly={joined} onReady={() => setFridge('shown')} onDone={() => setFridge('off')} />
+        </Suspense>
+      )}
       {!joined && (
         <JoinSheet
           onJoin={(withSound) => {
