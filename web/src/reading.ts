@@ -98,25 +98,34 @@ function hueOf(r: number, g: number, b: number) {
 }
 
 // Combine the model's answers with pixel facts. Where the model is unsure, pixels decide.
+// Model answers are only trusted when they're in the question's own vocabulary —
+// an off-menu choice would crash the lookup tables in music.ts.
+const MOODS = new Set<Mood>(['calm', 'happy', 'tense', 'festive', 'melancholy'])
+const TEXTURES = new Set<Texture>(['wooden', 'organic', 'metallic', 'electronic', 'airy'])
+const ROLES = new Set<Role>(['kick', 'percussion', 'bass', 'chords', 'melody', 'texture'])
+const ENERGIES = new Set(['1', '2', '3', '4', '5'])
+
 export function combine(m: ModelReading | null, p: Pixels): Reading {
   const a = m?.answers
-  const use = (k: 'mood' | 'energy' | 'texture' | 'role') => (a && !a[k].unsure ? a[k].choice : null)
+  const use = <T extends string>(k: 'mood' | 'energy' | 'texture' | 'role', ok: Set<string>) =>
+    (a?.[k] && !a[k].unsure && ok.has(a[k].choice) ? a[k].choice : null) as T | null
 
-  const energy = Number(use('energy') ?? Math.round(1 + p.busyness * 4))
-  const mood = (use('mood') ??
-    (p.brightness < 0.3 ? 'tense' : p.warmth > 0.25 ? 'happy' : p.brightness > 0.6 ? 'calm' : 'melancholy')) as Mood
-  const texture = (use('texture') ?? (p.warmth > 0.1 ? 'wooden' : p.brightness > 0.6 ? 'airy' : 'electronic')) as Texture
+  const energy = Number(use('energy', ENERGIES) ?? Math.round(1 + p.busyness * 4))
+  const mood =
+    use<Mood>('mood', MOODS) ??
+    (p.brightness < 0.3 ? 'tense' : p.warmth > 0.25 ? 'happy' : p.brightness > 0.6 ? 'calm' : 'melancholy')
+  const texture = use<Texture>('texture', TEXTURES) ?? (p.warmth > 0.1 ? 'wooden' : p.brightness > 0.6 ? 'airy' : 'electronic')
   const byHue: Role[] = ['chords', 'melody', 'kick', 'texture']
-  const role = (use('role') ??
-    (p.brightness < 0.3 ? 'bass' : p.busyness > 0.55 ? 'percussion' : byHue[p.hue % 4])) as Role
+  const role =
+    use<Role>('role', ROLES) ?? (p.brightness < 0.3 ? 'bass' : p.busyness > 0.55 ? 'percussion' : byHue[p.hue % 4])
   return {
     role,
     mood,
-    energy: Math.max(1, Math.min(5, energy)),
+    energy: Number.isFinite(energy) ? Math.max(1, Math.min(5, energy)) : 3,
     texture,
-    moodProb: a ? a.mood.prob : 0,
+    moodProb: a?.mood?.prob ?? 0,
     model: m?.model ?? 'pixels',
-    guessed: !a || Object.values(a).some((x) => x.unsure),
+    guessed: !a || Object.values(a).some((x) => x?.unsure),
     pixels: p,
   }
 }

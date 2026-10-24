@@ -7,7 +7,11 @@
   "assets": {
     "directory": "./web/dist",
     "binding": "ASSETS",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/parties/*"]
   },
+  // Rooms: one Durable Object per room holds the shared canvas (Yjs).
+  "durable_objects": { "bindings": [{ "name": "Room", "class_name": "Room" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
   "observability": { "enabled": true, "head_sampling_rate": 1 }
 }

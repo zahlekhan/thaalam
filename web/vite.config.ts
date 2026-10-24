@@ -9,5 +9,5 @@ export default defineConfig({
     // soundfonts and the player share one core.
     alias: { '@strudel/web': fileURLToPath(new URL('./node_modules/@strudel/web/web.mjs', import.meta.url)) },
   },
-  server: { port: 5180, proxy: { '/api': 'http://127.0.0.1:8000' } },
+  server: { port: 5180, proxy: { '/api': 'http://127.0.0.1:8000', '/parties': { target: 'http://127.0.0.1:8787', ws: true } } },
 })

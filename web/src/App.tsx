@@ -1,11 +1,18 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { Tldraw, createShapeId, useEditor, type Editor, type TLShapeId } from 'tldraw'
-import { CardUtil, readingOf, type CardShape } from './CardShape'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import {
+  ReactFlow,
+  ReactFlowProvider,
+  applyNodeChanges,
+  useReactFlow,
+  type Node,
+  type NodeChange,
+} from '@xyflow/react'
+import { CARD_H, CARD_W, Card, Stage, readingOf, type CardNode, type StageNode } from './CardShape'
 import { API_URL, askModel, measurePixels, shrink, type ModelReading } from './reading'
 import { mixFor } from './music'
 import { play, startSound } from './sound'
+import { cards, createRoom, doc, joinRoom, onPeers, peerCount, photos, roomFromUrl, type CardData } from './room'
 
-const STAGE = createShapeId('stage')
 const STAGE_W = 1120
 const STAGE_H = 640
 
@@ -19,6 +26,10 @@ type Sample = {
 const DEV = new URLSearchParams(location.search).has('dev')
 let currentModel = localStorage.getItem('thaalam-model') ?? 'jev'
 
+// A shared link drops you straight into its room.
+const initialRoom = roomFromUrl()
+if (initialRoom) joinRoom(initialRoom)
+
 // Tiny store so the overlay can show what's playing.
 let mix = { code: '', bpm: 0, scale: '', count: 0 }
 const listeners = new Set<() => void>()
@@ -30,31 +41,52 @@ const useMix = () => useSyncExternalStore((l) => (listeners.add(l), () => listen
 
 let started = false
 
-function ensureStage(editor: Editor) {
-  if (editor.getShape(STAGE)) return
-  editor.createShape({ id: STAGE, type: 'frame', x: 0, y: 0, props: { w: STAGE_W, h: STAGE_H, name: 'Stage' } })
+const nodeTypes = { card: Card, stage: Stage }
+
+const STAGE_NODE: StageNode = {
+  id: 'stage',
+  type: 'stage',
+  position: { x: 0, y: 0 },
+  width: STAGE_W,
+  height: STAGE_H,
+  data: {},
+  draggable: false,
+  selectable: false,
+  deletable: false,
+  focusable: false,
+  zIndex: -1,
 }
 
-// Next free slot on the stage, in page coordinates.
-function freeSpot(editor: Editor) {
-  const n = editor.getSortedChildIdsForParent(STAGE).length
+const FIT_STAGE = { nodes: [{ id: 'stage' }], padding: 0.05, maxZoom: 1 }
+
+// A card plays when its centre is on the stage.
+const onStage = (c: Pick<CardData, 'x' | 'y'>) => {
+  const cx = c.x + CARD_W / 2
+  const cy = c.y + CARD_H / 2
+  return cx >= 0 && cx <= STAGE_W && cy >= 0 && cy <= STAGE_H
+}
+
+// Next free slot on the stage.
+function freeSpot() {
+  const n = Array.from(cards.values()).filter(onStage).length
   const col = n % 5
   const row = Math.floor(n / 5) % 2
   return { x: 40 + col * 212, y: 60 + row * 280 }
 }
 
-async function addCard(editor: Editor, src: string, model: ModelReading | null, at?: { x: number; y: number }) {
-  const id = createShapeId()
-  const spot = at ?? freeSpot(editor)
-  editor.createShape({ id, type: 'card', x: spot.x, y: spot.y, parentId: at ? undefined : STAGE, props: { src } })
-  if (at) {
-    const stage = editor.getShapePageBounds(STAGE)
-    if (stage?.containsPoint(at)) editor.reparentShapes([id], STAGE)
+async function addCard(src: string, model: ModelReading | null, at?: { x: number; y: number }) {
+  const id = crypto.randomUUID()
+  const spot = at ?? freeSpot()
+  doc.transact(() => {
+    photos.set(id, src)
+    cards.set(id, { id, x: spot.x, y: spot.y, status: 'reading', model: '', pixels: '' })
+  })
+  // The card may be moved or removed while we read it, so always patch the latest copy.
+  const update = (patch: Partial<CardData>) => {
+    const c = cards.get(id)
+    if (c) cards.set(id, { ...c, ...patch })
   }
-  const pixels = await measurePixels(src)
-  const update = (props: Partial<CardShape['props']>) =>
-    editor.getShape(id) && editor.updateShape({ id, type: 'card', props })
-  update({ pixels: JSON.stringify(pixels) })
+  update({ pixels: JSON.stringify(await measurePixels(src)) })
   try {
     const m = model ?? (await askModel(src, currentModel))
     update({ model: JSON.stringify(m), status: 'ready' })
@@ -64,53 +96,131 @@ async function addCard(editor: Editor, src: string, model: ModelReading | null, 
   }
 }
 
-function stageCards(editor: Editor) {
-  return editor
-    .getSortedChildIdsForParent(STAGE)
-    .map((id) => editor.getShape(id as TLShapeId))
-    .filter((s): s is CardShape => s?.type === 'card' && s.props.status === 'ready')
-    .flatMap((s) => {
-      const reading = readingOf(s)
-      return reading ? [{ id: s.id, reading }] : []
+function stageCards() {
+  return Array.from(cards.values())
+    .filter((c) => c.status === 'ready' && onStage(c))
+    .sort((a, b) => a.id.localeCompare(b.id)) // same order on every device
+    .flatMap((c) => {
+      const reading = readingOf(c)
+      return reading ? [{ id: c.id, reading }] : []
     })
 }
 
-function onMount(editor: Editor) {
-  ensureStage(editor)
-  ;(window as any).editor = editor
-  const fitStage = () => {
-    const b = editor.getShapePageBounds(STAGE)
-    if (b) editor.zoomToBounds(b.clone().expandBy(40), { animation: { duration: 0 }, targetZoom: 1 })
-  }
-  requestAnimationFrame(fitStage)
+// Rebuild the flow's nodes from the shared doc, keeping local UI state (selection, drag, size).
+function nodesFromDoc(prev: Node[]): Node[] {
+  const old = new Map(prev.map((n) => [n.id, n]))
+  return [
+    STAGE_NODE,
+    ...Array.from(cards.values()).map(
+      (c): CardNode => ({
+        ...(old.get(c.id) as CardNode | undefined),
+        id: c.id,
+        type: 'card',
+        position: { x: c.x, y: c.y },
+        data: { ...c, onStage: onStage(c) },
+      })
+    ),
+  ]
+}
 
-  editor.registerExternalContentHandler('files', async (info) => {
-    const point = (info as { point?: { x: number; y: number } }).point ?? editor.getViewportPageBounds().center
-    for (const [i, file] of info.files.filter((f) => f.type.startsWith('image/')).entries()) {
-      const src = await shrink(file)
-      addCard(editor, src, null, { x: point.x - 90 + i * 30, y: point.y - 118 + i * 30 })
+function Board() {
+  const flow = useReactFlow()
+  const [nodes, setNodes] = useState<Node[]>(() => nodesFromDoc([]))
+
+  useEffect(() => {
+    let timer = 0
+    const refresh = () => {
+      setNodes(nodesFromDoc)
+      clearTimeout(timer)
+      timer = window.setTimeout(() => {
+        const playing = stageCards()
+        const m = mixFor(playing)
+        setMix({ code: m.code, bpm: m.bpm, scale: m.scale, count: playing.length })
+        if (started) play(m.code)
+      }, 120)
     }
-  })
+    cards.observe(refresh)
+    refresh()
+    return () => cards.unobserve(refresh)
+  }, [])
 
-  let timer = 0
-  const refresh = () => {
-    clearTimeout(timer)
-    timer = window.setTimeout(() => {
-      const cards = stageCards(editor)
-      const m = mixFor(cards)
-      setMix({ code: m.code, bpm: m.bpm, scale: m.scale, count: cards.length })
-      if (started) play(m.code)
-    }, 120)
-  }
-  editor.store.listen(refresh, { scope: 'document' })
-  refresh()
+  const onNodesChange = useCallback((changes: NodeChange[]) => {
+    setNodes((n) => applyNodeChanges(changes, n))
+    doc.transact(() => {
+      for (const ch of changes) {
+        if (ch.type === 'position' && ch.position) {
+          const c = cards.get(ch.id)
+          if (c) cards.set(ch.id, { ...c, x: ch.position.x, y: ch.position.y })
+        } else if (ch.type === 'remove' && cards.has(ch.id)) {
+          cards.delete(ch.id)
+          photos.delete(ch.id)
+        }
+      }
+    })
+  }, [])
+
+  const dropImages = useCallback(
+    async (files: File[], clientX: number, clientY: number) => {
+      const p = flow.screenToFlowPosition({ x: clientX, y: clientY })
+      for (const [i, file] of files.filter((f) => f.type.startsWith('image/')).entries()) {
+        addCard(await shrink(file), null, { x: p.x - CARD_W / 2 + i * 30, y: p.y - CARD_H / 2 + i * 30 })
+      }
+    },
+    [flow]
+  )
+
+  // Keep the stage in view when the window changes size (phone rotation, split screens).
+  useEffect(() => {
+    const fit = () => flow.fitView(FIT_STAGE)
+    addEventListener('resize', fit)
+    return () => removeEventListener('resize', fit)
+  }, [flow])
+
+  // Pasted images land in the middle of the screen.
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const files = Array.from(e.clipboardData?.files ?? [])
+      if (files.length) dropImages(files, innerWidth / 2, innerHeight / 2)
+    }
+    addEventListener('paste', onPaste)
+    return () => removeEventListener('paste', onPaste)
+  }, [dropImages])
+
+  return (
+    <div
+      className="app"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault()
+        dropImages(Array.from(e.dataTransfer.files), e.clientX, e.clientY)
+      }}
+    >
+      <ReactFlow
+        nodes={nodes}
+        onNodesChange={onNodesChange}
+        nodeTypes={nodeTypes}
+        fitView
+        fitViewOptions={FIT_STAGE}
+        minZoom={0.1}
+      />
+      <Overlay />
+    </div>
+  )
+}
+
+function usePeers() {
+  const [n, setN] = useState(peerCount)
+  const [room, setRoom] = useState(initialRoom)
+  useEffect(() => onPeers(() => setN(peerCount())), [room])
+  return { n, room, setRoom }
 }
 
 function Overlay() {
-  const editor = useEditor()
   const m = useMix()
+  const { n, room, setRoom } = usePeers()
   const [on, setOn] = useState(false)
   const [showCode, setShowCode] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [samples, setSamples] = useState<Sample[]>([])
   const [models, setModels] = useState<string[]>([])
   const [model, setModel] = useState(currentModel)
@@ -144,6 +254,17 @@ function Overlay() {
     play(mix.code)
   }
 
+  const invite = async () => {
+    if (!room) setRoom(createRoom())
+    try {
+      await navigator.clipboard.writeText(location.href)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      prompt('Share this link', location.href)
+    }
+  }
+
   return (
     <div className="overlay">
       <div className="topbar">
@@ -156,6 +277,9 @@ function Overlay() {
           <button className="primary" onClick={start}>Tap to start sound</button>
         )}
         <button onClick={() => fileRef.current?.click()}>Add photo</button>
+        <button onClick={invite} title={room ? `Room ${room}` : 'Create a room and copy its link'}>
+          {copied ? 'Link copied' : room ? `Room · ${n} here` : 'Invite friends'}
+        </button>
         <button onClick={() => setShowCode((v) => !v)}>{showCode ? 'Hide code' : 'Code'}</button>
         {DEV && (
           <select className="model" value={model} onChange={(e) => pickModel(e.target.value)} title="Model that reads photos">
@@ -173,7 +297,7 @@ function Overlay() {
           multiple
           hidden
           onChange={async (e) => {
-            for (const f of Array.from(e.target.files ?? [])) addCard(editor, await shrink(f), null)
+            for (const f of Array.from(e.target.files ?? [])) addCard(await shrink(f), null)
             e.target.value = ''
           }}
         />
@@ -189,9 +313,7 @@ function Overlay() {
               key={s.file}
               className="sample"
               title={`Photo by ${s.credit.name} on Unsplash`}
-              onClick={async () =>
-                addCard(editor, await toDataUrl(`/samples/${s.file}`), s.readings[currentModel] ?? null)
-              }
+              onClick={async () => addCard(await toDataUrl(`/samples/${s.file}`), s.readings[currentModel] ?? null)}
             >
               <img src={`/samples/${s.file}`} alt="" />
             </button>
@@ -211,8 +333,8 @@ async function toDataUrl(url: string) {
 
 export default function App() {
   return (
-    <div className="app">
-      <Tldraw shapeUtils={[CardUtil]} onMount={onMount} components={{ InFrontOfTheCanvas: Overlay, StylePanel: null }} />
-    </div>
+    <ReactFlowProvider>
+      <Board />
+    </ReactFlowProvider>
   )
 }
