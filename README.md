@@ -12,8 +12,42 @@ Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[D
 - **Working demo:** [Link](https://thaalam.theotherkhan271.workers.dev/)
 - **Video:** [thaalam-demo.mp4](thaalam-demo.mp4)
 
-<video src="thaalam-demo.mp4" controls></video>
 - **Technology stack:** React 19, TypeScript, Vite 8, React Flow (`@xyflow/react`), Yjs rooms, Strudel (`@strudel/web`) in `web/`; Python FastAPI in `server/` (local); Cloudflare Worker in `worker/` (hosted); Jev (TypeSafe) and vegaml vision models.
+
+<video src="https://github.com/zahlekhan/thaalam/raw/main/thaalam-demo.mp4" controls muted playsinline width="720"></video>
+
+### How it works
+
+```mermaid
+flowchart LR
+    subgraph Browser["Browser (web/)"]
+        A[Drop or paste a photo<br/>on the fridge canvas] --> B[Shrink to a 512px JPEG<br/>+ measure pixels:<br/>brightness, warmth, busyness,<br/>palette, saturation, clash, sharpness]
+        B -->|form POST| C[/api/analyze]
+        C --> D{Reading = model answers<br/>+ pixel measurements}
+        D --> E[music.ts builds<br/>a Strudel pattern]
+        E --> F[@strudel/web plays<br/>the loop in Web Audio]
+    end
+
+    subgraph Cloudflare["Cloudflare Worker (worker/index.js)"]
+        C --> G[Jev vision model:<br/>mood, energy, texture, role,<br/>8 gist questions, safety check]
+        G -->|flagged nudity/profanity| H[422 — card removed,<br/>photo never shared]
+        G -->|clean| I[/api/photos upload]
+        I --> J[(R2 bucket<br/>thaalam-photos)]
+        J --> K[/photos/id served<br/>with immutable cache]
+    end
+
+    subgraph Sync["Rooms & gallery"]
+        L[Yjs doc: cards, positions,<br/>photo URLs] <--> M[(Room Durable Object<br/>persisted forever)]
+        M -->|publish| N[(Gallery Durable Object)]
+        N --> O[/gallery — browsable<br/>public canvases]
+    end
+
+    K --> L
+    D --> L
+    L --> F
+```
+
+A flagged photo never leaves the uploader's device: it sits in a local-only `pendingPhotos` map until the model clears it, and only then is it uploaded to R2 and synced into the shared Yjs document. Locally, `server/app.py` (FastAPI) can stand in for the Worker and answer `/api/analyze` with Jev or the local vegaml model.
 
 ### Run the project
 
