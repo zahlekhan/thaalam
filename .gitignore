@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.venv/
+.venv-lite/
+__pycache__/
+web/public/test/
+.DS_Store
+.env.local

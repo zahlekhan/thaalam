@@ -1,0 +1,212 @@
+[
+ {
+  "file": "crowd.jpg",
+  "credit": {
+   "name": "John Thomas",
+   "profile": "https://unsplash.com/@capturelight",
+   "photo": "https://unsplash.com/photos/crowd-throwing-colorful-powder-at-festival-LtE6W_JVTGc"
+  },
+  "readings": {
+   "jev": {
+    "model": "jev",
+    "answers": {
+     "mood": {
+      "choice": "festive",
+      "prob": 0.99,
+      "unsure": false
+     },
+     "energy": {
+      "choice": "5",
+      "prob": 1.0,
+      "unsure": false
+     },
+     "texture": {
+      "choice": "airy",
+      "prob": 0.63,
+      "unsure": false
+     },
+     "role": {
+      "choice": "percussion",
+      "prob": 0.93,
+      "unsure": false
+     }
+    }
+   }
+  }
+ },
+ {
+  "file": "street.jpg",
+  "credit": {
+   "name": "Fawazlul Rizqi",
+   "profile": "https://unsplash.com/@mrmrt113",
+   "photo": "https://unsplash.com/photos/empty-asphalt-road-under-streetlights-8I-gdwRMw_M"
+  },
+  "readings": {
+   "jev": {
+    "model": "jev",
+    "answers": {
+     "mood": {
+      "choice": "calm",
+      "prob": 0.79,
+      "unsure": false
+     },
+     "energy": {
+      "choice": "1",
+      "prob": 0.98,
+      "unsure": false
+     },
+     "texture": {
+      "choice": "electronic",
+      "prob": 0.74,
+      "unsure": false
+     },
+     "role": {
+      "choice": "bass",
+      "prob": 0.52,
+      "unsure": false
+     }
+    }
+   }
+  }
+ },
+ {
+  "file": "lamps.jpg",
+  "credit": {
+   "name": "Sushanta Rokka",
+   "profile": "https://unsplash.com/@sanoyatra",
+   "photo": "https://unsplash.com/photos/many-illuminated-lamps-hanging-in-darkness-6RgGdhvhUKA"
+  },
+  "readings": {
+   "jev": {
+    "model": "jev",
+    "answers": {
+     "mood": {
+      "choice": "calm",
+      "prob": 0.58,
+      "unsure": false
+     },
+     "energy": {
+      "choice": "2",
+      "prob": 0.92,
+      "unsure": false
+     },
+     "texture": {
+      "choice": "metallic",
+      "prob": 0.99,
+      "unsure": false
+     },
+     "role": {
+      "choice": "percussion",
+      "prob": 0.71,
+      "unsure": false
+     }
+    }
+   }
+  }
+ },
+ {
+  "file": "chai.jpg",
+  "credit": {
+   "name": "Tirth Patel",
+   "profile": "https://unsplash.com/@piedcipher",
+   "photo": "https://unsplash.com/photos/glass-of-masala-chai-on-wood-c9nTmIvehyM"
+  },
+  "readings": {
+   "jev": {
+    "model": "jev",
+    "answers": {
+     "mood": {
+      "choice": "calm",
+      "prob": 0.87,
+      "unsure": false
+     },
+     "energy": {
+      "choice": "1",
+      "prob": 0.94,
+      "unsure": false
+     },
+     "texture": {
+      "choice": "wooden",
+      "prob": 0.65,
+      "unsure": false
+     },
+     "role": {
+      "choice": "melody",
+      "prob": 0.8,
+      "unsure": false
+     }
+    }
+   }
+  }
+ },
+ {
+  "file": "backwaters.jpg",
+  "credit": {
+   "name": "Abhishek Prasad",
+   "profile": "https://unsplash.com/@whatsabhidoing",
+   "photo": "https://unsplash.com/photos/houseboat-on-alappuzha-backwaters-ii0oWs5abCo"
+  },
+  "readings": {
+   "jev": {
+    "model": "jev",
+    "answers": {
+     "mood": {
+      "choice": "calm",
+      "prob": 0.91,
+      "unsure": false
+     },
+     "energy": {
+      "choice": "2",
+      "prob": 0.93,
+      "unsure": false
+     },
+     "texture": {
+      "choice": "organic",
+      "prob": 0.75,
+      "unsure": false
+     },
+     "role": {
+      "choice": "chords",
+      "prob": 0.54,
+      "unsure": false
+     }
+    }
+   }
+  }
+ },
+ {
+  "file": "rain.jpg",
+  "credit": {
+   "name": "Suhyeon Choi",
+   "profile": "https://unsplash.com/@by_syeoni",
+   "photo": "https://unsplash.com/photos/rain-drops-on-window-glass-HCDugQDdtfc"
+  },
+  "readings": {
+   "jev": {
+    "model": "jev",
+    "answers": {
+     "mood": {
+      "choice": "melancholy",
+      "prob": 0.94,
+      "unsure": false
+     },
+     "energy": {
+      "choice": "2",
+      "prob": 0.84,
+      "unsure": false
+     },
+     "texture": {
+      "choice": "organic",
+      "prob": 0.79,
+      "unsure": false
+     },
+     "role": {
+      "choice": "percussion",
+      "prob": 0.51,
+      "unsure": false
+     }
+    }
+   }
+  }
+ }
+]
