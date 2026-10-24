@@ -1,0 +1,70 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Rubik,system-ui,sans-serif;color:#1B1B1F;
+background:#CDEFE0;background-image:radial-gradient(ellipse at 30% 0%,rgba(255,255,255,.55),transparent 60%);position:relative}
+.top{position:absolute;top:18px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between}
+.word{display:flex;gap:1px;font-weight:900;font-size:30px;letter-spacing:-1px}
+.word span{text-shadow:0 2px 0 rgba(0,0,0,.18)}
+.chip{background:#fff;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700;box-shadow:0 0 0 2px #FFC41F}
+.chip b{color:#E8322B}
+.card{position:absolute;width:132px;background:#fff;padding:8px 8px 10px;border-radius:6px;box-shadow:0 6px 14px rgba(20,60,40,.18)}
+.ph{height:112px;border-radius:2px}
+.lab{margin-top:8px;font-size:13px;font-weight:700}
+.sub{font-size:12px;font-weight:500;color:#5a5f63}
+.mag{position:absolute;top:-14px;left:50%;margin-left:-17px;width:34px;height:34px;border-radius:50%;
+box-shadow:inset 0 -4px 0 rgba(0,0,0,.2),inset 0 3px 0 rgba(255,255,255,.45),0 4px 6px rgba(0,0,0,.25);
+display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900}
+.muted .ph{filter:grayscale(1) brightness(1.1);opacity:.6}
+.muted .mag{background:#B9C2BF!important}
+.menu{position:absolute;left:170px;top:452px;background:#1B1B1F;color:#fff;border-radius:14px;padding:6px;display:flex;gap:4px;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.menu div{padding:10px 14px;border-radius:10px;font-size:14px;font-weight:700}
+.menu .on{background:#FFC41F;color:#1B1B1F}
+.toast{position:absolute;left:16px;right:16px;bottom:106px;background:#fff;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:500;display:flex;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.toast b{color:#1E5BD8}
+.bar{position:absolute;left:12px;right:12px;bottom:18px;height:72px;background:#fff;border-radius:22px;display:flex;align-items:center;gap:10px;padding:0 10px;box-shadow:0 8px 24px rgba(20,60,40,.2)}
+.play{width:56px;height:56px;border-radius:50%;background:#E8322B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2)}
+.btn{flex:1;height:52px;border-radius:16px;background:#F1F5F3;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+.btn.inv{background:#1E5BD8;color:#fff}
+</style></head><body>
+<div class="top">
+  <div class="word"><span style="color:#E8322B">t</span><span style="color:#1E5BD8">h</span><span style="color:#FFC41F">a</span><span style="color:#1FA34A">a</span><span style="color:#FF7A1A">l</span><span style="color:#8A4FE0">a</span><span style="color:#E8322B">m</span></div>
+  <div class="chip">4 playing · <b>104 BPM</b> · upbeat</div>
+</div>
+
+<div class="card" style="left:22px;top:104px;transform:rotate(-6deg)">
+  <div class="mag" style="background:#E8322B">●</div>
+  <div class="ph" style="background:linear-gradient(160deg,#f6c26b,#c4581f 60%,#5b2410)"></div>
+  <div class="lab">Round kick</div><div class="sub">warm · chai</div>
+</div>
+<div class="card" style="left:200px;top:96px;transform:rotate(5deg) scale(1.04)">
+  <div class="mag" style="background:#FFC41F;color:#1B1B1F">♪</div>
+  <div class="ph" style="background:linear-gradient(200deg,#ff5fa2,#ffd23f 45%,#2ec4b6)"></div>
+  <div class="lab">Hi-hats</div><div class="sub">festive · crowd</div>
+</div>
+<div class="card" style="left:120px;top:282px;transform:rotate(-2deg)">
+  <div class="mag" style="background:#1E5BD8">♪</div>
+  <div class="ph" style="background:linear-gradient(180deg,#1b2a52,#3a6fb0 55%,#9fc4e8)"></div>
+  <div class="lab">Synth bass</div><div class="sub">calm · rain</div>
+</div>
+<div class="card muted" style="left:14px;top:438px;transform:rotate(7deg)">
+  <div class="mag">✕</div>
+  <div class="ph" style="background:linear-gradient(170deg,#2d6a4f,#74c69d 60%,#d8f3dc)"></div>
+  <div class="lab">Soft keys</div><div class="sub">muted · tap to unmute</div>
+</div>
+<div class="card" style="left:216px;top:470px;transform:rotate(-8deg);box-shadow:0 0 0 3px #1B1B1F,0 10px 20px rgba(0,0,0,.25)">
+  <div class="mag" style="background:#8A4FE0">♪</div>
+  <div class="ph" style="background:linear-gradient(150deg,#ffb703,#fb8500 50%,#3d1d00)"></div>
+  <div class="lab">Bell melody</div><div class="sub">happy · lamps</div>
+</div>
+<div class="menu" style="top:640px;left:150px"><div class="on">Mute</div><div>Delete</div></div>
+
+<div class="toast"><span>Removed “street”</span><b>Undo</b></div>
+<div class="bar">
+  <div class="play">■</div>
+  <div class="btn">+ Add photo</div>
+  <div class="btn inv">Invite · 3 here</div>
+</div>
+</body></html>

@@ -1,0 +1,559 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T18:06:55+00:00",
+  "title": "Design System: Thaalam",
+  "extensions": {
+    "colorMeta": {
+      "enamel": {
+        "role": "neutral",
+        "displayName": "Mint Enamel",
+        "canonical": "oklch(92.4% 0.041 167)",
+        "tonalRamp": [
+          "oklch(15% 0.041 167)",
+          "oklch(26% 0.041 167)",
+          "oklch(37% 0.041 167)",
+          "oklch(48% 0.041 167)",
+          "oklch(59% 0.041 167)",
+          "oklch(70% 0.041 167)",
+          "oklch(82% 0.041 167)",
+          "oklch(95% 0.041 167)"
+        ]
+      },
+      "enamel-hi": {
+        "role": "neutral",
+        "displayName": "Enamel Sheen",
+        "canonical": "oklch(96.3% 0.022 165)",
+        "tonalRamp": [
+          "oklch(15% 0.022 165)",
+          "oklch(26% 0.022 165)",
+          "oklch(37% 0.022 165)",
+          "oklch(48% 0.022 165)",
+          "oklch(59% 0.022 165)",
+          "oklch(70% 0.022 165)",
+          "oklch(82% 0.022 165)",
+          "oklch(95% 0.022 165)"
+        ]
+      },
+      "enamel-lo": {
+        "role": "neutral",
+        "displayName": "Enamel Shade",
+        "canonical": "oklch(89.2% 0.048 164)",
+        "tonalRamp": [
+          "oklch(15% 0.048 164)",
+          "oklch(26% 0.048 164)",
+          "oklch(37% 0.048 164)",
+          "oklch(48% 0.048 164)",
+          "oklch(59% 0.048 164)",
+          "oklch(70% 0.048 164)",
+          "oklch(82% 0.048 164)",
+          "oklch(95% 0.048 164)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "oklch(100.0% 0.000 90)",
+        "tonalRamp": [
+          "oklch(15% 0.000 90)",
+          "oklch(26% 0.000 90)",
+          "oklch(37% 0.000 90)",
+          "oklch(48% 0.000 90)",
+          "oklch(59% 0.000 90)",
+          "oklch(70% 0.000 90)",
+          "oklch(82% 0.000 90)",
+          "oklch(95% 0.000 90)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(22.4% 0.008 286)",
+        "tonalRamp": [
+          "oklch(15% 0.008 286)",
+          "oklch(26% 0.008 286)",
+          "oklch(37% 0.008 286)",
+          "oklch(48% 0.008 286)",
+          "oklch(59% 0.008 286)",
+          "oklch(70% 0.008 286)",
+          "oklch(82% 0.008 286)",
+          "oklch(95% 0.008 286)"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Soft Ink",
+        "canonical": "oklch(39.6% 0.019 166)",
+        "tonalRamp": [
+          "oklch(15% 0.019 166)",
+          "oklch(26% 0.019 166)",
+          "oklch(37% 0.019 166)",
+          "oklch(48% 0.019 166)",
+          "oklch(59% 0.019 166)",
+          "oklch(70% 0.019 166)",
+          "oklch(82% 0.019 166)",
+          "oklch(95% 0.019 166)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(90.2% 0.020 168)",
+        "tonalRamp": [
+          "oklch(15% 0.020 168)",
+          "oklch(26% 0.020 168)",
+          "oklch(37% 0.020 168)",
+          "oklch(48% 0.020 168)",
+          "oklch(59% 0.020 168)",
+          "oklch(70% 0.020 168)",
+          "oklch(82% 0.020 168)",
+          "oklch(95% 0.020 168)"
+        ]
+      },
+      "wash": {
+        "role": "neutral",
+        "displayName": "Mint Wash",
+        "canonical": "oklch(96.6% 0.010 165)",
+        "tonalRamp": [
+          "oklch(15% 0.010 165)",
+          "oklch(26% 0.010 165)",
+          "oklch(37% 0.010 165)",
+          "oklch(48% 0.010 165)",
+          "oklch(59% 0.010 165)",
+          "oklch(70% 0.010 165)",
+          "oklch(82% 0.010 165)",
+          "oklch(95% 0.010 165)"
+        ]
+      },
+      "kick": {
+        "role": "tertiary",
+        "displayName": "Kick Red",
+        "canonical": "oklch(60.7% 0.218 28)",
+        "tonalRamp": [
+          "oklch(15% 0.070 28)",
+          "oklch(26% 0.107 28)",
+          "oklch(37% 0.143 28)",
+          "oklch(48% 0.180 28)",
+          "oklch(59% 0.217 28)",
+          "oklch(70% 0.187 28)",
+          "oklch(82% 0.147 28)",
+          "oklch(95% 0.103 28)"
+        ]
+      },
+      "percussion": {
+        "role": "tertiary",
+        "displayName": "Sticker Yellow",
+        "canonical": "oklch(85.0% 0.169 86)",
+        "tonalRamp": [
+          "oklch(15% 0.070 86)",
+          "oklch(26% 0.107 86)",
+          "oklch(37% 0.143 86)",
+          "oklch(48% 0.169 86)",
+          "oklch(59% 0.169 86)",
+          "oklch(70% 0.169 86)",
+          "oklch(82% 0.147 86)",
+          "oklch(95% 0.103 86)"
+        ]
+      },
+      "bass": {
+        "role": "tertiary",
+        "displayName": "Bass Blue",
+        "canonical": "oklch(51.3% 0.202 262)",
+        "tonalRamp": [
+          "oklch(15% 0.070 262)",
+          "oklch(26% 0.107 262)",
+          "oklch(37% 0.143 262)",
+          "oklch(48% 0.180 262)",
+          "oklch(59% 0.202 262)",
+          "oklch(70% 0.187 262)",
+          "oklch(82% 0.147 262)",
+          "oklch(95% 0.103 262)"
+        ]
+      },
+      "chords": {
+        "role": "tertiary",
+        "displayName": "Leaf Green",
+        "canonical": "oklch(62.8% 0.168 149)",
+        "tonalRamp": [
+          "oklch(15% 0.070 149)",
+          "oklch(26% 0.107 149)",
+          "oklch(37% 0.143 149)",
+          "oklch(48% 0.168 149)",
+          "oklch(59% 0.168 149)",
+          "oklch(70% 0.168 149)",
+          "oklch(82% 0.147 149)",
+          "oklch(95% 0.103 149)"
+        ]
+      },
+      "melody": {
+        "role": "tertiary",
+        "displayName": "Grape Purple",
+        "canonical": "oklch(57.1% 0.210 298)",
+        "tonalRamp": [
+          "oklch(15% 0.070 298)",
+          "oklch(26% 0.107 298)",
+          "oklch(37% 0.143 298)",
+          "oklch(48% 0.180 298)",
+          "oklch(59% 0.210 298)",
+          "oklch(70% 0.187 298)",
+          "oklch(82% 0.147 298)",
+          "oklch(95% 0.103 298)"
+        ]
+      },
+      "texture": {
+        "role": "tertiary",
+        "displayName": "Tangerine",
+        "canonical": "oklch(72.4% 0.187 49)",
+        "tonalRamp": [
+          "oklch(15% 0.070 49)",
+          "oklch(26% 0.107 49)",
+          "oklch(37% 0.143 49)",
+          "oklch(48% 0.180 49)",
+          "oklch(59% 0.187 49)",
+          "oklch(70% 0.187 49)",
+          "oklch(82% 0.147 49)",
+          "oklch(95% 0.103 49)"
+        ]
+      },
+      "magnet-idle": {
+        "role": "tertiary",
+        "displayName": "Idle Grey",
+        "canonical": "oklch(80.9% 0.017 167)",
+        "tonalRamp": [
+          "oklch(15% 0.017 167)",
+          "oklch(26% 0.017 167)",
+          "oklch(37% 0.017 167)",
+          "oklch(48% 0.017 167)",
+          "oklch(59% 0.017 167)",
+          "oklch(70% 0.017 167)",
+          "oklch(82% 0.017 167)",
+          "oklch(95% 0.017 167)"
+        ]
+      },
+      "go": {
+        "role": "primary",
+        "displayName": "Go Red",
+        "canonical": "oklch(53.8% 0.200 28)",
+        "tonalRamp": [
+          "oklch(15% 0.070 28)",
+          "oklch(26% 0.107 28)",
+          "oklch(37% 0.143 28)",
+          "oklch(48% 0.180 28)",
+          "oklch(59% 0.200 28)",
+          "oklch(70% 0.187 28)",
+          "oklch(82% 0.147 28)",
+          "oklch(95% 0.103 28)"
+        ]
+      },
+      "go-hover": {
+        "role": "primary",
+        "displayName": "Go Red Pressed",
+        "canonical": "oklch(47.5% 0.176 28)",
+        "tonalRamp": [
+          "oklch(15% 0.070 28)",
+          "oklch(26% 0.107 28)",
+          "oklch(37% 0.143 28)",
+          "oklch(48% 0.176 28)",
+          "oklch(59% 0.176 28)",
+          "oklch(70% 0.176 28)",
+          "oklch(82% 0.147 28)",
+          "oklch(95% 0.103 28)"
+        ]
+      },
+      "invite": {
+        "role": "secondary",
+        "displayName": "Invite Blue",
+        "canonical": "oklch(51.3% 0.202 262)",
+        "tonalRamp": [
+          "oklch(15% 0.070 262)",
+          "oklch(26% 0.107 262)",
+          "oklch(37% 0.143 262)",
+          "oklch(48% 0.180 262)",
+          "oklch(59% 0.202 262)",
+          "oklch(70% 0.187 262)",
+          "oklch(82% 0.147 262)",
+          "oklch(95% 0.103 262)"
+        ]
+      },
+      "invite-hover": {
+        "role": "secondary",
+        "displayName": "Invite Blue Pressed",
+        "canonical": "oklch(44.1% 0.173 262)",
+        "tonalRamp": [
+          "oklch(15% 0.070 262)",
+          "oklch(26% 0.107 262)",
+          "oklch(37% 0.143 262)",
+          "oklch(48% 0.173 262)",
+          "oklch(59% 0.173 262)",
+          "oklch(70% 0.173 262)",
+          "oklch(82% 0.147 262)",
+          "oklch(95% 0.103 262)"
+        ]
+      },
+      "danger": {
+        "role": "neutral",
+        "displayName": "Brick",
+        "canonical": "oklch(42.3% 0.153 28)",
+        "tonalRamp": [
+          "oklch(15% 0.070 28)",
+          "oklch(26% 0.107 28)",
+          "oklch(37% 0.143 28)",
+          "oklch(48% 0.153 28)",
+          "oklch(59% 0.153 28)",
+          "oklch(70% 0.153 28)",
+          "oklch(82% 0.147 28)",
+          "oklch(95% 0.103 28)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "The multicolour magnet-letter wordmark only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Gallery page title; join heading at 28px/750."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet headings and the empty-canvas hint."
+      },
+      "action": {
+        "displayName": "Action",
+        "purpose": "Solid commit buttons."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Introductory sentence in join and gallery."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Bottom-bar buttons."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Hints, publish copy, toasts."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Card titles, selection name, sheet subheads."
+      },
+      "status": {
+        "displayName": "Status",
+        "purpose": "Status chip, tabular numerals."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Card meta line, fine print, credits."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Code view only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "print",
+        "value": "0 6px 14px rgba(28, 70, 52, 0.22), 0 1px 2px rgba(28, 70, 52, 0.18)",
+        "purpose": "Photo prints, sample tiles, mini prints."
+      },
+      {
+        "name": "lift",
+        "value": "0 10px 28px rgba(28, 70, 52, 0.22)",
+        "purpose": "Floating chrome: control bar, menu, sheets, selection pill, toast."
+      },
+      {
+        "name": "peel",
+        "value": "0 14px 28px rgba(28, 70, 52, 0.3), 0 2px 4px rgba(28, 70, 52, 0.2)",
+        "purpose": "A print while dragged."
+      },
+      {
+        "name": "chip",
+        "value": "0 2px 8px rgba(28, 70, 52, 0.14)",
+        "purpose": "Status chip and gallery back link."
+      },
+      {
+        "name": "magnet-gloss",
+        "value": "inset 0 -4px 0 rgba(0,0,0,0.18), inset 0 3px 2px rgba(255,255,255,0.45), 0 4px 6px rgba(0,0,0,0.28)",
+        "purpose": "Plastic dome of a magnet."
+      },
+      {
+        "name": "plastic-lip",
+        "value": "inset 0 -4px 0 rgba(0, 0, 0, 0.2)",
+        "purpose": "Go Red buttons, matching magnet plastic."
+      },
+      {
+        "name": "selection-ring",
+        "value": "0 0 0 3px #1b1b1f",
+        "purpose": "Selected/focused print, hovered sample, stacked over print."
+      }
+    ],
+    "motion": [
+      {
+        "name": "magnet-bounce",
+        "value": "translateY(-5px) scale(1.14) -> none, 240ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Magnet hit on each of its card's notes, timed to the audio clock; skipped under reduced motion."
+      },
+      {
+        "name": "state-fade",
+        "value": "0.2s to 0.3s default ease",
+        "purpose": "Shadow, background and filter changes on state (selection, mute, status highlight); collapsed under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "max-width: 420px"
+      },
+      {
+        "name": "sheet-dialog",
+        "value": "min-width: 640px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Go Button",
+      "kind": "button",
+      "refersTo": "button-go",
+      "description": "The one commit action: Join the jam, Publish.",
+      "html": "<button class=\"ds-go\">Join the jam</button>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-go{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 20px;border:0;border-radius:16px;background:var(--go);color:#fff;font:650 17px 'Rubik Variable',system-ui,sans-serif;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2);cursor:pointer}.ds-go:hover{background:var(--go-hover)}.ds-go:focus-visible{outline:3px solid var(--ink);outline-offset:2px}"
+    },
+    {
+      "name": "Play Button",
+      "kind": "button",
+      "refersTo": "button-play",
+      "description": "Round Play/Stop in the control bar; Ink while playing.",
+      "html": "<button class=\"ds-play\" aria-label=\"Play\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 5.5v13l10.5-6.5z\" fill=\"currentColor\"/></svg></button>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-play{width:56px;height:56px;border:0;border-radius:50%;background:var(--go);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2);cursor:pointer}.ds-play:hover{background:var(--go-hover)}.ds-play:active{background:var(--ink)}.ds-play:focus-visible{outline:3px solid var(--ink);outline-offset:2px}"
+    },
+    {
+      "name": "Bar Button",
+      "kind": "button",
+      "refersTo": "button-bar",
+      "description": "Neutral control-bar action such as Add photo.",
+      "html": "<button class=\"ds-bar\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg> Add photo</button>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-bar{height:52px;padding:0 20px;border:0;border-radius:16px;background:var(--wash);color:var(--ink);display:inline-flex;align-items:center;gap:6px;font:600 16px 'Rubik Variable',system-ui,sans-serif;cursor:pointer}.ds-bar:hover{background:#e2efe8}.ds-bar:focus-visible{outline:3px solid var(--ink);outline-offset:2px}"
+    },
+    {
+      "name": "Invite Button",
+      "kind": "button",
+      "refersTo": "button-invite",
+      "description": "The social action: Invite, Copy link.",
+      "html": "<button class=\"ds-invite\">Invite · 3 here</button>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-invite{height:52px;padding:0 20px;border:0;border-radius:16px;background:var(--invite);color:#fff;font:600 16px 'Rubik Variable',system-ui,sans-serif;cursor:pointer}.ds-invite:hover{background:var(--invite-hover)}.ds-invite:focus-visible{outline:3px solid var(--ink);outline-offset:2px}"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip-status",
+      "description": "Mix summary; turns Sticker Yellow until a change is noticed.",
+      "html": "<span class=\"ds-status\">4 playing · 104 BPM · festive</span> <span class=\"ds-status ds-changed\">4 playing · 112 BPM · festive</span>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-status{display:inline-block;background:var(--paper);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;box-shadow:0 2px 8px rgba(28,70,52,.14);transition:background-color .3s}.ds-changed{background:var(--percussion)}"
+    },
+    {
+      "name": "Print with Magnet",
+      "kind": "card",
+      "refersTo": "card-print",
+      "description": "The signature photo card: white print, role magnet, hand tilt.",
+      "html": "<div class=\"ds-wrap\"><div class=\"ds-card\" tabindex=\"0\"><span class=\"ds-magnet\"></span><div class=\"ds-photo\"></div><div class=\"ds-label\"><b>Synth bass</b><span>calm · Ravi</span></div></div><div class=\"ds-card ds-muted\" style=\"rotate:4deg\"><span class=\"ds-magnet\"></span><div class=\"ds-photo\"></div><div class=\"ds-label\"><b>Soft keys</b><span>muted · Ravi</span></div></div></div>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-wrap{display:flex;gap:32px;padding:32px;background:var(--enamel)}.ds-card{position:relative;width:160px;height:200px;background:var(--paper);padding:8px 8px 0;border-radius:4px;box-shadow:var(--print);display:flex;flex-direction:column;rotate:-3deg;transition:box-shadow .2s}.ds-card:hover,.ds-card:focus-visible{outline:none;box-shadow:0 0 0 3px var(--ink),var(--print)}.ds-magnet{position:absolute;top:-14px;left:50%;margin-left:-18px;width:36px;height:36px;border-radius:50%;background:var(--bass);box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),inset 0 3px 2px rgba(255,255,255,.45),0 4px 6px rgba(0,0,0,.28)}.ds-photo{height:132px;background:linear-gradient(160deg,#3a5a8c,#141c2b)}.ds-label{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px}.ds-label b{font-size:15px;font-weight:650}.ds-label span{font-size:13px;color:var(--ink-soft)}.ds-muted .ds-magnet{background:var(--magnet-idle)}.ds-muted .ds-photo{filter:grayscale(1);opacity:.5}"
+    },
+    {
+      "name": "Control Bar",
+      "kind": "nav",
+      "refersTo": "control-bar",
+      "description": "Bottom thumb-reach bar: Play, Add photo, Invite, More.",
+      "html": "<nav class=\"ds-bottombar\"><button class=\"ds-p\" aria-label=\"Play\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 5.5v13l10.5-6.5z\" fill=\"currentColor\"/></svg></button><button class=\"ds-b\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg> Add photo</button><button class=\"ds-b ds-i\">Invite · 3</button></nav>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-bottombar{display:flex;align-items:center;gap:8px;padding:8px;max-width:560px;background:var(--paper);border-radius:24px;box-shadow:var(--lift)}.ds-p{flex:none;width:56px;height:56px;border:0;border-radius:50%;background:var(--go);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2);cursor:pointer}.ds-p:hover{background:var(--go-hover)}.ds-b{flex:1;height:52px;border:0;border-radius:16px;background:var(--wash);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:6px;font:600 16px 'Rubik Variable',system-ui,sans-serif;cursor:pointer}.ds-b:hover{background:#e2efe8}.ds-i{background:var(--invite);color:#fff}.ds-i:hover{background:var(--invite-hover)}.ds-bottombar :focus-visible{outline:3px solid var(--ink);outline-offset:2px}"
+    },
+    {
+      "name": "Selected-card Pill",
+      "kind": "custom",
+      "refersTo": "selection-pill",
+      "description": "Dark transient toolbar above the bar for the selected card.",
+      "html": "<div class=\"ds-sel\"><span class=\"ds-n\"><b>Synth bass</b><span>calm · Ravi</span></span><button>Mute</button><button>Delete</button></div>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-sel{display:flex;align-items:center;gap:4px;padding:6px 6px 6px 12px;max-width:560px;background:var(--ink);color:#fff;border-radius:20px;box-shadow:var(--lift)}.ds-n{flex:1;display:flex;flex-direction:column}.ds-n b{font-size:15px;font-weight:650}.ds-n span{font-size:13px;color:#c9d3cf}.ds-sel button{min-height:44px;padding:0 12px;border:0;border-radius:14px;background:none;color:#fff;font:600 15px 'Rubik Variable',system-ui,sans-serif;cursor:pointer}.ds-sel button:hover{background:rgba(255,255,255,.14)}.ds-sel button:focus-visible{outline:3px solid var(--percussion);outline-offset:2px}"
+    },
+    {
+      "name": "Name Field",
+      "kind": "input",
+      "refersTo": "input-name",
+      "description": "Join sheet name input; border turns Ink on focus.",
+      "html": "<label class=\"ds-field\">Your name<input placeholder=\"Mango Kazoo\"></label>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-field{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;max-width:360px}.ds-field input{height:52px;padding:0 16px;border:2px solid var(--line);border-radius:14px;font:500 17px 'Rubik Variable',system-ui,sans-serif;color:var(--ink)}.ds-field input::placeholder{color:#5f6e67}.ds-field input:focus-visible{outline:none;border-color:var(--ink)}"
+    },
+    {
+      "name": "Toast",
+      "kind": "custom",
+      "refersTo": "toast",
+      "description": "Ink notice with a Sticker Yellow action (Undo); Brick for errors.",
+      "html": "<div class=\"ds-toast\"><span>Deleted Synth bass</span><button>Undo</button></div>",
+      "css": ":host{--u:8px;--enamel:#cdefe0;--paper:#fff;--ink:#1b1b1f;--ink-soft:#3d4a44;--line:#d3e3dc;--wash:#eef6f2;--kick:#e8322b;--percussion:#ffc41f;--bass:#1e5bd8;--chords:#1fa34a;--melody:#8a4fe0;--magnet-idle:#b7c4be;--go:#c8231d;--go-hover:#a91c17;--invite:#1e5bd8;--invite-hover:#1749b0;--danger:#8f1a15;--lift:0 10px 28px rgba(28,70,52,.22);--print:0 6px 14px rgba(28,70,52,.22),0 1px 2px rgba(28,70,52,.18);font-family:'Rubik Variable',system-ui,sans-serif;color:var(--ink)} .ds-toast{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 16px;max-width:520px;background:var(--ink);color:#fff;border-radius:16px;box-shadow:var(--lift);font-size:15px}.ds-toast span{flex:1}.ds-toast button{min-height:44px;padding:0 12px;border:0;border-radius:12px;background:none;color:var(--percussion);font:700 15px 'Rubik Variable',system-ui,sans-serif;cursor:pointer}.ds-toast button:hover{background:rgba(255,255,255,.14)}.ds-toast button:focus-visible{outline:3px solid var(--percussion);outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Fridge Door",
+    "overview": "The canvas is the shared fridge door everyone sticks things to. A glossy mint enamel ground carries white-bordered photo prints hung at small random angles, each held by a chunky plastic magnet in its role's colour. Everything else (the control bar, the status chip, the sheets) is white plastic or paper resting on the same door, so the interface reads as household objects rather than software chrome.\n\nDensity is low and tactile. Cards are one fixed size and land wherever people drop them; there is no grid, stage or lane to tidy them into. State lives on the object itself: a muted card's magnet goes grey and its photo desaturates, a card still being read shows a striped placeholder with a grey magnet, and a tempo or mood change turns the status chip yellow until someone notices. Motion comes from the music: each magnet bounces on its own card's notes, and it stays still under reduced motion.\n\nThe world refuses the whiteboard with a dashed stage and the dark DAW mixer. Dark ink appears only as small transient overlays (the selected-card pill, the toast, the code view) and as the solid commit button inside a sheet. The ground itself is never dark.",
+    "keyCharacteristics": [
+      "Mint enamel ground with a soft top-left sheen, never flat white or dark.",
+      "White paper prints (160 x 200px) at a random tilt between -6 and 6 degrees.",
+      "One glossy plastic magnet per card, coloured by role, grey when muted or still being read.",
+      "Rubik for everything; heavy 900 only for the multicolour magnet-letter wordmark.",
+      "Thumb-reach white control bar at the bottom, status chip at top right.",
+      "Authored stroke icons on one 24px grid, 2.2 stroke, round caps and joins.",
+      "One 8px unit drives card size, magnet size, bar heights and spacing."
+    ],
+    "rules": [
+      {
+        "name": "The Magnet Owns the Colour Rule",
+        "body": "Role colours never fill buttons, panels or text blocks. If a surface is coloured by role, it is a magnet (or a wordmark letter).",
+        "section": "colors"
+      },
+      {
+        "name": "The Deep Cut Rule",
+        "body": "When a role colour must carry white text it is replaced by its deep cut (go for kick, invite for bass), never used raw.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Highlight Rule",
+        "body": "Sticker Yellow behind ink means \"something changed, look\". It is not decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Family Rule",
+        "body": "Rubik carries every role; contrast comes from weight (400 to 900), never from a second display face.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Stage Rule",
+        "body": "The canvas has no frame, grid, lanes or drop zone. Cards stay exactly where people leave them.",
+        "section": "layout"
+      },
+      {
+        "name": "The Door Light Rule",
+        "body": "Every drop shadow falls straight down and is tinted green from the enamel, never neutral black, except the magnet's own contact shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** hang every photo as a white print with its role magnet on top and a random tilt between -6 and 6 degrees.",
+      "**Do** show card state on the magnet and the print (grey magnet, greyscale photo, stripes), never in a legend or separate list.",
+      "**Do** derive sizes and spacing from the 8px unit, and keep every tap target at least 44px.",
+      "**Do** keep primary controls in the bottom bar in thumb reach, at most 560px wide.",
+      "**Do** tint drop shadows with the enamel green (rgba(28, 70, 52, ...)).",
+      "**Do** drive decorative motion only from the audio clock, and keep it still under prefers-reduced-motion.",
+      "**Do** use the deep cuts (go, invite) when a coloured surface carries white text."
+    ],
+    "donts": [
+      "**Don't** add a stage frame, grid, lanes or drop zone to the canvas.",
+      "**Don't** make the ground dark or turn controls into a mixer; Ink is for small transient overlays and the sheet commit button.",
+      "**Don't** fill buttons, panels or text with raw role colours; they belong to magnets and the wordmark.",
+      "**Don't** use hard offset shadows or neutral black drop shadows.",
+      "**Don't** introduce a second typeface for display; use Rubik weights.",
+      "**Don't** use emoji or glyph characters as icons; draw them on the 24px stroke grid.",
+      "**Don't** rotate controls, sheets or chips; only prints and mini prints hang at an angle."
+    ]
+  }
+}
