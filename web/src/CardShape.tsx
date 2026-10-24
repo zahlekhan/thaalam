@@ -2,7 +2,7 @@ import { memo } from 'react'
 import type { Node, NodeProps } from '@xyflow/react'
 import { combine, type ModelReading, type Pixels, type Role } from './reading'
 import { instrumentFor } from './music'
-import { photos, type CardData } from './room'
+import { pendingPhotos, photos, type CardData } from './room'
 
 export const CARD_W = 180
 export const CARD_H = 236
@@ -28,6 +28,8 @@ export function readingOf(card: Pick<CardData, 'pixels' | 'model'>) {
 
 export const Card = memo(function Card({ data }: NodeProps<CardNode>) {
   const reading = data.status === 'ready' ? readingOf(data) : null
+  // Blank until the model clears the photo; uploader gets a local preview.
+  const src = photos.get(data.id) ?? pendingPhotos.get(data.id)
   const glow = reading?.pixels.palette[0] ?? '#888'
   const inst = reading ? instrumentFor(reading) : null
 
@@ -42,7 +44,7 @@ export const Card = memo(function Card({ data }: NodeProps<CardNode>) {
       data-card={data.id}
       style={{ width: CARD_W, height: CARD_H, ['--glow' as string]: glow }}
     >
-      <img src={photos.get(data.id)} draggable={false} alt="" />
+      {src ? <img src={src} draggable={false} alt="" /> : null}
       <div className="card-info">
         <div className="card-inst">{reading ? `${ROLE_ICON[reading.role]} ${inst?.label}` : ' '}</div>
         <div className="card-line">{line}</div>

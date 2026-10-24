@@ -4,12 +4,26 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-24T22:35:18+05:30 — Record the new card interaction in product context
+
+- Changed: `PRODUCT.md` now describes the scattered canvas instead of the stage. Every card plays unless muted. Drag moves a card; click or tap opens its actions (mute or unmute, delete). The stage frame and parking are gone from the terminology and principles.
+- Why: The user decided cards should be an unorganized mess with per-card mute and delete, instead of dragging cards off a stage to silence them.
+- Validation: Documentation only. Checked that `PRODUCT.md` no longer uses stage or parking terms except where it notes the current code.
+- Limitations: Not built yet. The app still uses the stage frame and parking until the redesign lands.
+
 ## 2026-10-24T22:31:11+05:30 — Logging for the server, Worker and web app
 
 - Changed: `server/app.py` logs startup settings (no key value), each reading (model, bytes, ms, answers), rejected uploads, and Jev failures. Jev timeouts, network errors and malformed replies now return a 502 with a clear `detail` instead of a bare 500. `worker/index.js` logs the same events as JSON objects for Cloudflare observability, handles the same Jev failures, and logs room connect/close/error in `Room`. `web/src/App.tsx` and `web/src/reading.ts` log failed readings (with the server's `detail`), a failed health check, and a failed samples load. `web/src/CardShape.tsx` now shows "Can't reach the model" when the model call failed; before, the `'error'` status it checked was never set. README documents the logs.
 - Why: Before this, failures showed only as status codes in the logs, with the reason visible only to the browser.
 - Validation: `npm --prefix web run build` passed. Ran the FastAPI server locally and checked the logs and responses for a real Jev reading, a bad key (401 to 502), an unreachable Jev (ConnectError to 502), a non-image upload (400), and an unavailable model (400). Ran `wrangler dev` and checked the same Jev success, 401 and unavailable-model cases, plus a room WebSocket connect and close.
 - Limitations: A Jev timeout and a malformed Jev reply were not triggered directly; they share the handlers checked above. Locally, `wrangler dev` prints "Uncaught Error: Network connection lost" after a room socket closes; this also happens on the code before this change. Root `npm ci` needs `--legacy-peer-deps` (a `@cloudflare/workers-types` peer conflict between `wrangler` and `partyserver`); this is unchanged.
+
+## 2026-10-24T22:20:06+05:30 — Add product context for design work
+
+- Changed: Added `PRODUCT.md`, which records the product facts design work should keep: users (friends jamming together first), purpose, positioning (a photo is a stem; the model reads, code writes the music), terminology, constraints, evidence on hand, and principles.
+- Why: Give later UI and design work (the Impeccable skill) a confirmed product record instead of re-deriving it from the code each time.
+- Validation: Checked the facts against `CONTEXT.md`, `README.md` and the current code (`web/src/`, `worker/index.js`, `server/app.py`). The user confirmed the primary audience, the horizon and how the brand uses the name.
+- Limitations: Photo and room retention and the public gallery were changing in the uncommitted working tree, so `PRODUCT.md` marks them as open. `README.md` and `CONTEXT.md` still describe tldraw and say rooms aren't built yet; this entry doesn't update them.
 
 ## 2026-10-24T22:11:43+05:30 — Options menu at the bottom right
 

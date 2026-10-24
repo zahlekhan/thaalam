@@ -8,11 +8,22 @@ import {
   type NodeChange,
 } from '@xyflow/react'
 import { CARD_H, CARD_W, Card, Stage, readingOf, type CardNode, type StageNode } from './CardShape'
-import { API_URL, askModel, measurePixels, shrink, type ModelReading } from './reading'
+import { API_URL, askModel, measurePixels, PhotoRejected, shrink, uploadPhoto, type ModelReading } from './reading'
 import { mixFor } from './music'
 import { play, startSound } from './sound'
 import { Camera, hasLiveCamera } from './Camera'
-import { cards, createRoom, doc, joinRoom, onPeers, peerCount, photos, roomFromUrl, type CardData } from './room'
+import {
+  cards,
+  createRoom,
+  doc,
+  joinRoom,
+  onPeers,
+  peerCount,
+  pendingPhotos,
+  photos,
+  roomFromUrl,
+  type CardData,
+} from './room'
 
 const STAGE_W = 1120
 const STAGE_H = 640
@@ -38,6 +49,20 @@ const setMix = (m: typeof mix) => {
   listeners.forEach((l) => l())
 }
 const useMix = () => useSyncExternalStore((l) => (listeners.add(l), () => listeners.delete(l)), () => mix)
+
+// One-line notice (e.g. a rejected photo). Same listener set as the mix store.
+let notice = ''
+let noticeTimer = 0
+function notify(msg: string) {
+  notice = msg
+  listeners.forEach((l) => l())
+  clearTimeout(noticeTimer)
+  noticeTimer = window.setTimeout(() => {
+    notice = ''
+    listeners.forEach((l) => l())
+  }, 5000)
+}
+const useNotice = () => useSyncExternalStore((l) => (listeners.add(l), () => listeners.delete(l)), () => notice)
 
 let started = false
 
@@ -77,8 +102,10 @@ function freeSpot() {
 async function addCard(src: string, model: ModelReading | null, at?: { x: number; y: number }) {
   const id = crypto.randomUUID()
   const spot = at ?? freeSpot()
+  // The photo stays local until the model clears it — peers see a
+  // "Listening..." card but never the image before that.
+  pendingPhotos.set(id, src)
   doc.transact(() => {
-    photos.set(id, src)
     cards.set(id, { id, x: spot.x, y: spot.y, status: 'reading', model: '', pixels: '' })
   })
   // The card may be moved or removed while we read it, so always patch the latest copy.
@@ -89,10 +116,25 @@ async function addCard(src: string, model: ModelReading | null, at?: { x: number
   update({ pixels: JSON.stringify(await measurePixels(src)) })
   try {
     const m = model ?? (await askModel(src, currentModel))
+    // Cleared — park it in R2 so rooms and the public gallery can link to it.
+    photos.set(id, await uploadPhoto(src))
+    pendingPhotos.delete(id)
     update({ model: JSON.stringify(m), status: 'ready' })
   } catch (e) {
+    if (e instanceof PhotoRejected) {
+      pendingPhotos.delete(id)
+      doc.transact(() => {
+        cards.delete(id)
+        photos.delete(id)
+      })
+      notify(e.message)
+      return
+    }
     console.warn('[thaalam] model reading failed, using pixels only:', e)
-    update({ status: 'ready' }) // pixels alone still make a part
+    // Model unreachable: keep the photo (shared now) and let pixels make a part.
+    photos.set(id, src)
+    pendingPhotos.delete(id)
+    update({ status: 'ready' })
   }
 }
 
@@ -204,6 +246,7 @@ function Board() {
         minZoom={0.1}
       />
       <Overlay />
+      <Disclaimer />
     </div>
   )
 }
@@ -217,11 +260,13 @@ function usePeers() {
 
 function Overlay() {
   const m = useMix()
+  const notice = useNotice()
   const { n, room, setRoom } = usePeers()
   const [on, setOn] = useState(false)
   const [showCode, setShowCode] = useState(false)
   const [optionsOpen, setOptionsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [isPublic, setIsPublic] = useState(false)
   const [samples, setSamples] = useState<Sample[]>([])
   const [models, setModels] = useState<string[]>([])
   const [model, setModel] = useState(currentModel)
@@ -259,6 +304,25 @@ function Overlay() {
     setModel(m)
   }
 
+  // Whether this room is listed in the public gallery.
+  useEffect(() => {
+    if (!room) return setIsPublic(false)
+    fetch(`${API_URL}/api/rooms/${room}`)
+      .then((r) => r.json())
+      .then((s) => setIsPublic(!!s.published))
+      .catch(() => {})
+  }, [room])
+
+  const togglePublic = async () => {
+    if (!room) return
+    try {
+      await fetch(`${API_URL}/api/rooms/${room}/${isPublic ? 'unpublish' : 'publish'}`, { method: 'POST' })
+      setIsPublic(!isPublic)
+    } catch {
+      notify("Couldn't reach the server")
+    }
+  }
+
   const start = async () => {
     await startSound()
     started = true
@@ -281,6 +345,7 @@ function Overlay() {
     <div className="overlay">
       <div className="topbar">
         <span className="brand">Thaalam</span>
+        {notice && <span className="notice">{notice}</span>}
         {on ? (
           <span className="status">
             {m.count ? `${m.count} playing · ${m.bpm} BPM · ${m.scale}` : 'Drop a photo on the stage'}
@@ -293,6 +358,17 @@ function Overlay() {
         <button onClick={invite} title={room ? `Room ${room}` : 'Create a room and copy its link'}>
           {copied ? 'Link copied' : room ? `Room · ${n} here` : 'Invite friends'}
         </button>
+        {room && (
+          <button
+            onClick={togglePublic}
+            title={isPublic ? 'Listed in the public gallery — click to unlist' : 'List this canvas in the public gallery'}
+          >
+            {isPublic ? 'Public' : 'Share publicly'}
+          </button>
+        )}
+        <a className="nav" href="/gallery">
+          Gallery
+        </a>
         <input
           ref={fileRef}
           type="file"
@@ -382,7 +458,82 @@ async function toDataUrl(url: string) {
   return shrink(await (await fetch(url)).blob())
 }
 
+// Shown once, then remembered on this device.
+function Disclaimer() {
+  const [show, setShow] = useState(() => localStorage.getItem('thaalam-seen-disclaimer-v2') !== '1')
+  if (!show) return null
+  return (
+    <div className="disclaimer-backdrop">
+      <div className="disclaimer">
+        <p>
+          Photos you add are shared with everyone in the room and read by an AI model. Nudity and
+          profanity are not allowed. Canvases are permanent — publishing one lists it in the public
+          gallery for anyone to open.
+        </p>
+        <button
+          className="primary"
+          onClick={() => {
+            localStorage.setItem('thaalam-seen-disclaimer-v2', '1')
+            setShow(false)
+          }}
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+  )
+}
+
+type GalleryRoom = { room: string; at: number; cards: number; previews: string[] }
+
+function GalleryPage() {
+  const [rooms, setRooms] = useState<GalleryRoom[] | null>(null)
+  useEffect(() => {
+    fetch(`${API_URL}/api/gallery`)
+      .then((r) => r.json())
+      .then((g) => setRooms(g.rooms ?? []))
+      .catch(() => setRooms([]))
+  }, [])
+  return (
+    <div className="gallery-page">
+      <div className="topbar">
+        <span className="brand">Thaalam</span>
+        <span className="status">Public canvases</span>
+        <a className="nav" href="/">
+          Back to canvas
+        </a>
+      </div>
+      <div className="gallery-grid">
+        {rooms === null ? (
+          <p className="gallery-empty">Loading…</p>
+        ) : rooms.length === 0 ? (
+          <p className="gallery-empty">Nothing public yet — share a canvas to see it here.</p>
+        ) : (
+          rooms.map((r) => (
+            <a key={r.room} className="gallery-card" href={`/?room=${r.room}`}>
+              <div className="gallery-thumbs">
+                {r.previews.length ? (
+                  r.previews.map((p) => <img key={p} src={p} alt="" />)
+                ) : (
+                  <div className="gallery-noimg" />
+                )}
+              </div>
+              <div className="gallery-meta">
+                <span>Room {r.room}</span>
+                <span>
+                  {r.cards} cards · {new Date(r.at).toLocaleDateString()}
+                </span>
+              </div>
+            </a>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
+  if (location.pathname === '/gallery') return <GalleryPage />
   return (
     <ReactFlowProvider>
       <Board />

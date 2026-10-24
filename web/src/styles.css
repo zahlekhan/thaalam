@@ -127,6 +127,17 @@ body,
   color: #fff;
   font-weight: 600;
 }
+.topbar a.nav {
+  font-size: 14px;
+  color: #444;
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: #eee;
+}
+.topbar a.nav:hover {
+  text-decoration: none;
+}
 .code {
   position: absolute;
   top: 110px;
@@ -182,6 +193,22 @@ body,
   color: #777;
   padding: 0 6px;
   white-space: nowrap;
+}
+.notice {
+  font-size: 14px;
+  color: #c0392b;
+  order: 5;
+  width: 100%;
+  text-align: center;
+}
+.disclaimer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
 }
 .camera {
   position: absolute;
@@ -285,4 +312,80 @@ body,
   .options {
     bottom: 104px;
   }
+}
+.disclaimer {
+  max-width: 380px;
+  margin: 0 16px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 22px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+.disclaimer button {
+  margin-top: 12px;
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  background: #ff6a3d;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  padding: 90px 24px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.gallery-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.15s ease;
+}
+.gallery-card:hover {
+  transform: translateY(-2px);
+}
+.gallery-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  height: 140px;
+  background: #f0f0f0;
+}
+.gallery-thumbs img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+.gallery-noimg {
+  width: 100%;
+  height: 140px;
+  background: #f0f0f0;
+}
+.gallery-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+.gallery-meta span:last-child {
+  font-size: 12px;
+  color: #888;
+}
+.gallery-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #777;
+  font-size: 15px;
+  padding: 60px 0;
 }

@@ -18,6 +18,11 @@ export const cards = doc.getMap<CardData>('cards')
 // Photos live apart from cards so moving a card doesn't resend the photo.
 export const photos = doc.getMap<string>('photos')
 
+// Photos still waiting on the model's safety check live here — local only,
+// never synced. Only the uploader sees the preview; peers see nothing until
+// the photo is cleared and lands in `photos`.
+export const pendingPhotos = new Map<string, string>()
+
 export const roomFromUrl = () => new URLSearchParams(location.search).get('room')
 
 let provider: YProvider | null = null

@@ -71,6 +71,14 @@ QUESTIONS = {
             "texture": "wide, soft, empty, sky, background atmosphere",
         },
     },
+    "safety": {
+        "type": "choice",
+        "instructions": "Does this photo show nudity, sexual content, or profanity (rude words, obscene gestures)?",
+        "criteria": {
+            "clean": "none of that — an ordinary photo",
+            "flagged": "nudity, sexual content, profanity, or obscene gestures visible",
+        },
+    },
 }
 
 app = FastAPI(title="Thaalam")
@@ -166,6 +174,10 @@ def read_photo(data: bytes, model: str) -> dict:
         log.warning("analyze rejected: model=%s not in %s", model, available())
         raise HTTPException(400, f"{model} isn't available on this server")
     answers = ask_jev(img) if model == "jev" else ask_vegaml(img)
+    safety = answers.pop("safety", None)  # moderation result stays server-side
+    if safety and safety["choice"] == "flagged":
+        log.warning("analyze rejected: safety flagged, %d bytes", len(data))
+        raise HTTPException(422, "That photo isn't allowed — no nudity or profanity.")
     ms = round((time.time() - started) * 1000)
     log.info(
         "analyze model=%s bytes=%d ms=%d %s",

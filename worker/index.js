@@ -2,11 +2,17 @@
 // frontend works unchanged. Ports server/app.py (FastAPI) — Jev is the only
 // model here; vegaml stays local-only.
 
-import { routePartykitRequest } from "partyserver";
+import { routePartykitRequest, Server } from "partyserver";
 import { YServer } from "y-partyserver";
+import * as Y from "yjs";
 
-// One shared canvas per room (/parties/room/<id>). Kept in memory only:
-// photos are not stored after everyone leaves.
+function galleryStub(env) {
+  return env.Gallery.get(env.Gallery.idFromName("gallery"));
+}
+
+// One shared canvas per room (/parties/room/<id>). The Yjs doc is persisted in
+// the Durable Object's storage — rooms are permanent. Publishing a room lists
+// it in the public gallery.
 export class Room extends YServer {
   onConnect(conn, ctx) {
     console.log({ event: "room.connect", room: this.name, conn: conn.id });
@@ -20,6 +26,89 @@ export class Room extends YServer {
 
   onError(conn, error) {
     console.error({ event: "room.error", room: this.name, conn: conn.id, error: String(error) });
+  }
+
+  async onLoad() {
+    const update = await this.ctx.storage.get("doc");
+    if (update) Y.applyUpdate(this.document, update);
+  }
+
+  async onSave() {
+    await this.ctx.storage.put("doc", Y.encodeStateAsUpdate(this.document));
+    // Keep a published room's gallery entry fresh as the canvas changes.
+    if (await this.ctx.storage.get("published")) await this.registerWithGallery();
+  }
+
+  // HTTP requests that reach this DO (from /api/rooms/<id>/...).
+  async onRequest(request) {
+    const url = new URL(request.url);
+    if (request.method === "POST" && url.pathname === "/publish") {
+      await this.ctx.storage.put("published", true);
+      await this.registerWithGallery();
+      return json({ ok: true });
+    }
+    if (request.method === "POST" && url.pathname === "/unpublish") {
+      await this.ctx.storage.delete("published");
+      await galleryStub(this.env).fetch(new Request("https://gallery/remove", { method: "POST", body: JSON.stringify({ room: this.name }) }));
+      return json({ ok: true });
+    }
+    if (request.method === "GET") {
+      return json({ published: !!(await this.ctx.storage.get("published")) });
+    }
+    return new Response("Not found", { status: 404 });
+  }
+
+  // Snapshot for the public gallery: first few R2-backed photo URLs + card count.
+  // Inline data-URL photos (e.g. samples) are skipped — they'd bloat the listing.
+  async registerWithGallery() {
+    const previews = [];
+    for (const src of this.document.getMap("photos").values()) {
+      if (typeof src === "string" && src.startsWith("/photos/")) previews.push(src);
+      if (previews.length >= 4) break;
+    }
+    await galleryStub(this.env).fetch(
+      new Request("https://gallery/upsert", {
+        method: "POST",
+        body: JSON.stringify({
+          room: this.name,
+          cards: this.document.getMap("cards").size,
+          previews,
+          at: Date.now(),
+        }),
+      })
+    );
+  }
+}
+
+// Registry of rooms that were shared publicly. Single instance, SQLite storage.
+export class Gallery extends Server {
+  onStart() {
+    this.ctx.storage.sql.exec(
+      "CREATE TABLE IF NOT EXISTS rooms (room TEXT PRIMARY KEY, at INTEGER NOT NULL, cards INTEGER NOT NULL, previews TEXT NOT NULL)"
+    );
+  }
+
+  async onRequest(request) {
+    if (request.method === "POST") {
+      const body = await request.json();
+      if (new URL(request.url).pathname === "/remove") {
+        this.ctx.storage.sql.exec("DELETE FROM rooms WHERE room = ?", body.room);
+      } else {
+        this.ctx.storage.sql.exec(
+          "INSERT INTO rooms (room, at, cards, previews) VALUES (?, ?, ?, ?) " +
+            "ON CONFLICT(room) DO UPDATE SET at = excluded.at, cards = excluded.cards, previews = excluded.previews",
+          body.room,
+          body.at ?? Date.now(),
+          body.cards ?? 0,
+          JSON.stringify(body.previews ?? [])
+        );
+      }
+      return json({ ok: true });
+    }
+    const rows = this.ctx.storage.sql
+      .exec("SELECT room, at, cards, previews FROM rooms ORDER BY at DESC LIMIT 200")
+      .toArray();
+    return json({ rooms: rows.map((r) => ({ ...r, previews: JSON.parse(r.previews) })) });
   }
 }
 
@@ -71,6 +160,14 @@ const JEV_QUESTIONS = {
       chords: "warm, cosy, a full balanced scene",
       melody: "one clear subject that stands out, a story, a face",
       texture: "wide, soft, empty, sky, background atmosphere",
+    },
+  },
+  safety: {
+    type: "choice",
+    instructions: "Does `photo` show nudity, sexual content, or profanity (rude words, obscene gestures)?",
+    criteria: {
+      clean: "none of that — an ordinary photo",
+      flagged: "nudity, sexual content, profanity, or obscene gestures visible",
     },
   },
 };
@@ -152,22 +249,28 @@ async function analyze(request, env, url) {
   }
 
   const text = await r.text();
-  let answers;
+  let out;
   try {
-    answers = Object.fromEntries(
-      Object.entries(JSON.parse(text).answers).map(([q, a]) => [
-        q,
-        {
-          choice: a.choice,
-          prob: a.probabilities[a.choice],
-          unsure: (a.confidence ?? 1) < 0.35,
-        },
-      ])
-    );
+    out = JSON.parse(text).answers;
   } catch (e) {
     console.error({ event: "jev.bad_reply", error: String(e), body: text.slice(0, 500) });
     return json({ detail: "Jev sent an unexpected reply" }, 502);
   }
+  if (out.safety?.choice === "flagged") {
+    console.warn({ event: "analyze.rejected", reason: "safety flagged", bytes: photo.size });
+    return json({ detail: "That photo isn't allowed — no nudity or profanity." }, 422);
+  }
+  delete out.safety; // moderation result stays server-side, never reaches a card
+  const answers = Object.fromEntries(
+    Object.entries(out).map(([q, a]) => [
+      q,
+      {
+        choice: a.choice,
+        prob: a.probabilities[a.choice],
+        unsure: (a.confidence ?? 1) < 0.35,
+      },
+    ])
+  );
   const ms = Date.now() - started;
   console.log({
     event: "analyze",
@@ -179,11 +282,60 @@ async function analyze(request, env, url) {
   return json({ model: "jev", ms, answers });
 }
 
+async function uploadPhoto(request, env) {
+  if (request.method !== "POST") return json({ detail: "Method not allowed" }, 405);
+  let photo;
+  try {
+    photo = (await request.formData()).get("photo");
+  } catch {
+    return json({ detail: "Expected a multipart photo upload" }, 400);
+  }
+  if (!(photo instanceof File)) return json({ detail: "No photo in the upload" }, 400);
+  if (photo.size > 15 * 1024 * 1024) return json({ detail: "Photo is too big" }, 413);
+  const key = `photos/${crypto.randomUUID()}.jpg`;
+  await env.PHOTOS.put(key, await photo.arrayBuffer(), {
+    httpMetadata: { contentType: "image/jpeg" },
+  });
+  return json({ url: `/${key}` });
+}
+
+function servePhoto(env, url) {
+  // Keys are unguessable UUIDs, so a URL is shareable but not enumerable.
+  return env.PHOTOS.get(url.pathname.slice(1)).then(
+    (obj) =>
+      obj
+        ? new Response(obj.body, {
+            headers: {
+              "Content-Type": obj.httpMetadata?.contentType ?? "image/jpeg",
+              "Cache-Control": "public, max-age=31536000, immutable",
+            },
+          })
+        : new Response("Not found", { status: 404 })
+  );
+}
+
+// /api/rooms/<id>          → { published }
+// /api/rooms/<id>/publish  → mark public, add to gallery
+// /api/rooms/<id>/unpublish
+function roomAction(request, env, url) {
+  const m = url.pathname.match(/^\/api\/rooms\/([^/]+)(\/publish|\/unpublish)?$/);
+  if (!m) return json({ detail: "Not found" }, 404);
+  const stub = env.Room.get(env.Room.idFromName(m[1]));
+  const path = m[2] ?? "/status";
+  return stub.fetch(new Request(`https://room${path}`, { method: request.method }));
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/api/health") return health(env);
     if (url.pathname === "/api/analyze") return analyze(request, env, url);
+    if (url.pathname === "/api/photos") return uploadPhoto(request, env);
+    if (url.pathname === "/api/gallery") {
+      return galleryStub(env).fetch(request);
+    }
+    if (url.pathname.startsWith("/api/rooms/")) return roomAction(request, env, url);
+    if (url.pathname.startsWith("/photos/")) return servePhoto(env, url);
     if (url.pathname.startsWith("/parties/")) {
       return (await routePartykitRequest(request, env)) ?? new Response("Not found", { status: 404 });
     }
