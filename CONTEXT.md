@@ -36,7 +36,7 @@ With friends:
 | Reading | Controls |
 |---|---|
 | role | which part the card plays |
-| texture (warm: wooden, organic / cool: metallic, electronic, airy) x role | instrument (12 to start, 2 per role) |
+| texture (wooden, organic, metallic, electronic, airy) x role | instrument (30, one per role and texture) |
 | energy 1 to 5 | which pattern from the role's menu (sparse to busy) |
 | busyness | straight or syncopated variant |
 | brightness | register and filter (dark photos sound darker) |
@@ -49,6 +49,7 @@ Mix level:
 - Scale: mood vote. calm = major pentatonic, happy = major, tense = phrygian, festive = mixolydian, melancholy = minor.
 - Key: fixed for now.
 - All cards play at the same volume for now.
+- Bass and chord notes ring until the next note. Chords, melody and pads share one light reverb; drums and bass stay dry. Percussion is accented on the beat.
 - Two cards with the same role take turns every 2 bars.
 
 Patterns come from small hand-written menus per role. The model picks readings; code picks and plays patterns. Melodic parts are written in scale degrees so they fit any key.

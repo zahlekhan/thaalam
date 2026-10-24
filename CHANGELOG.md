@@ -4,6 +4,14 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T01:22:00+05:30 — More instruments and a fuller sound
+
+- Changed: Each role now has one instrument per photo texture (30 in all, up from 12 picked by a warm/cool split), so the model's 5-way texture answer is used. The original 12 sounds keep a slot. New: kit, punchy and retro kicks; wood block, drum machine and brushes; fretless, picked and soft synth bass; nylon guitar, steel drums and reed organ chords; sitar, synth beeps and flute melodies; bowed, metal and synth pads. Drum banks now list the sample numbers to use, because `n(0..4)` on `hh` could pick a crash cymbal or a kick. Metallic percussion now uses `linnhats` instead of `hh`, which measured 15 dB quieter than the other percussion. Bass and chord notes ring until the next note instead of lasting one 16th step. Chords, melody and pads get light reverb (`room(0.3)`). Percussion is accented on the beat.
+- Why: The user asked to improve the sound and expand instruments. Before this, two of the three percussion samples played the same hi-hats, low-energy bass played one short blip per bar, and everything was dry.
+- Files: `web/src/music.ts`, `CONTEXT.md`.
+- Validation: `npm --prefix web run build` passes. With `npm run dev:worker` in the in-app browser, played each of the 30 role-and-texture parts alone and measured peak and RMS through a Strudel analyser: all load and play with no console errors, and each new sound sits inside the level range of the role's original sounds (fretless bass is about 3.6 dB above the loudest original bass). Added all 6 samples: 6 playing at 94 BPM, card titles show the new instruments, no console errors.
+- Limitations: Levels were measured, not judged by ear; a person still needs to listen. A new soundfont skips its first notes while it loads. The levels already varied a lot inside each role (the round kick is about 12 dB quieter than the club kick); this change doesn't even them out. Only the crowd sample changes sound (hi-hats to brushes); lamps keeps hi-hats from a louder bank.
+
 ## 2026-10-25T01:20:00+05:30 — Hide the room link input in Invite
 
 - Changed: The invite sheet no longer shows the room URL in a readonly input; a full-width "Copy link" button sits beside the QR. Copy fallback now asks people to copy the address bar.

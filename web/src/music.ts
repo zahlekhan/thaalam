@@ -1,7 +1,7 @@
 // Readings in, Strudel code out. The model never writes music: it picks readings,
 // and these menus decide what can be played.
 
-import type { Mood, Reading, Role } from './reading'
+import type { Mood, Reading, Role, Texture } from './reading'
 
 export type PlayingCard = { id: string; reading: Reading }
 
@@ -20,6 +20,9 @@ const TRIADS = '<[0,2,4] [5,7,9] [3,5,7] [4,6,8]>'
 
 // Rhythm menus: [energy 1..5][straight, syncopated], 16 steps per bar.
 const R = (s: string) => s.replace(/\s+/g, ' ').trim()
+// Hold each note until the next one ("x ~ ~ x" becomes "x _ _ x"), so sparse bass and chords
+// ring instead of blipping for one step.
+const hold = (s: string) => R(s).replace(/x( ~)+/g, (m) => m.replace(/~/g, '_'))
 const RHYTHM: Record<'kick' | 'percussion' | 'bass' | 'chords', string[][]> = {
   kick: [
     ['x ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 'x ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ x ~ ~ ~ ~'],
@@ -60,44 +63,67 @@ const MELODY: Record<Mood, [string, string]> = {
   melancholy: ['7 ~ ~ ~ 5 ~ ~ ~ 4 ~ ~ ~ 2 ~ 1 ~', '7 ~ 5 4 ~ 2 4 ~ 2 1 ~ 0 ~ ~ ~ ~'],
 }
 
-// Two instruments per role. Warm textures get the first, cool ones the second.
-export const INSTRUMENT: Record<Role, [string, string]> = {
-  kick: ['808bd', 'clubkick'],
-  percussion: ['tabla', 'hh'],
-  bass: ['gm_acoustic_bass', 'sawtooth'],
-  chords: ['gm_epiano1', 'square'],
-  melody: ['gm_marimba', 'gm_vibraphone'],
-  texture: ['gm_pad_warm', 'gm_pad_halo'],
-}
+// One instrument per role and photo texture. Drum banks also hold crashes and odd hits, so
+// `hits` lists the sample numbers that suit a steady beat.
+type Sound = { name: string; label: string; hits?: number[] }
 
-const NICE_NAME: Record<string, string> = {
-  '808bd': 'Round kick',
-  clubkick: 'Club kick',
-  tabla: 'Tabla',
-  hh: 'Hi-hats',
-  gm_acoustic_bass: 'Upright bass',
-  sawtooth: 'Synth bass',
-  gm_epiano1: 'Soft keys',
-  square: 'Synth stabs',
-  gm_marimba: 'Marimba',
-  gm_vibraphone: 'Vibraphone',
-  gm_pad_warm: 'Warm pad',
-  gm_pad_halo: 'Halo pad',
+export const INSTRUMENT: Record<Role, Record<Texture, Sound>> = {
+  kick: {
+    wooden: { name: 'jazz', label: 'Kit kick', hits: [0] },
+    organic: { name: '808bd', label: 'Round kick', hits: [0, 1] },
+    metallic: { name: 'bd', label: 'Punchy kick', hits: [0, 1] },
+    electronic: { name: 'clubkick', label: 'Club kick', hits: [0, 1] },
+    airy: { name: 'kicklinn', label: 'Retro kick', hits: [0] },
+  },
+  percussion: {
+    wooden: { name: 'east', label: 'Wood block', hits: [0] },
+    organic: { name: 'tabla', label: 'Tabla', hits: [0, 1, 2, 3, 4] },
+    metallic: { name: 'linnhats', label: 'Hi-hats', hits: [0, 1] }, // 'hh' was 15 dB quieter than the rest
+    electronic: { name: '808', label: 'Drum machine', hits: [1, 4] }, // closed hat, maracas
+    airy: { name: 'gretsch', label: 'Brushes', hits: [2, 3] },
+  },
+  bass: {
+    wooden: { name: 'gm_acoustic_bass', label: 'Upright bass' },
+    organic: { name: 'gm_fretless_bass', label: 'Fretless bass' },
+    metallic: { name: 'gm_electric_bass_pick', label: 'Picked bass' },
+    electronic: { name: 'sawtooth', label: 'Synth bass' },
+    airy: { name: 'triangle', label: 'Soft synth bass' },
+  },
+  chords: {
+    wooden: { name: 'gm_acoustic_guitar_nylon', label: 'Nylon guitar' },
+    organic: { name: 'gm_epiano1', label: 'Soft keys' },
+    metallic: { name: 'gm_steel_drums', label: 'Steel drums' },
+    electronic: { name: 'square', label: 'Synth stabs' },
+    airy: { name: 'gm_reed_organ', label: 'Reed organ' },
+  },
+  melody: {
+    wooden: { name: 'gm_marimba', label: 'Marimba' },
+    organic: { name: 'gm_sitar', label: 'Sitar' },
+    metallic: { name: 'gm_vibraphone', label: 'Vibraphone' },
+    electronic: { name: 'triangle', label: 'Synth beeps' },
+    airy: { name: 'gm_flute', label: 'Flute' },
+  },
+  texture: {
+    wooden: { name: 'gm_pad_bowed', label: 'Bowed pad' },
+    organic: { name: 'gm_pad_warm', label: 'Warm pad' },
+    metallic: { name: 'gm_pad_metallic', label: 'Metal pad' },
+    electronic: { name: 'gm_pad_poly', label: 'Synth pad' },
+    airy: { name: 'gm_pad_halo', label: 'Halo pad' },
+  },
 }
 
 const OCTAVE: Record<Role, number> = { kick: 0, percussion: 0, bass: 2, chords: 3, melody: 4, texture: 3 }
 
-export function instrumentFor(r: Reading) {
-  const warm = r.texture === 'wooden' || r.texture === 'organic'
-  const name = INSTRUMENT[r.role][warm ? 0 : 1]
-  return { name, label: NICE_NAME[name] ?? name }
+export function instrumentFor(r: Reading): Sound {
+  return INSTRUMENT[r.role][r.texture]
 }
 
 // Palette breaks ties: two photos with the same reading still differ by colour.
 const variantOf = (r: Reading) => r.pixels.hue % 2
 
 export function partFor(r: Reading, scale: string): string {
-  const inst = instrumentFor(r).name
+  const { name: inst, hits = [0] } = instrumentFor(r)
+  const hit = hits[r.pixels.hue % hits.length]
   const e = r.energy - 1
   const synco = r.pixels.busyness > 0.45 ? 1 : 0
   const v = variantOf(r)
@@ -108,17 +134,19 @@ export function partFor(r: Reading, scale: string): string {
 
   switch (r.role) {
     case 'kick':
-      return `s("${inst}").n(${v}).struct("${R(RHYTHM.kick[e][synco])}").gain(1)`
+      return `s("${inst}").n(${hit}).struct("${R(RHYTHM.kick[e][synco])}").gain(1)`
     case 'percussion':
-      return `s("${inst}").n(${v + (r.pixels.hue % 4)}).struct("${R(RHYTHM.percussion[e][synco])}").gain(0.7)`
+      // Loud on the beat, softer between, so fast patterns don't sound like a machine gun.
+      return `s("${inst}").n(${hit}).struct("${R(RHYTHM.percussion[e][synco])}").velocity("[1 .6 .8 .6]*4").gain(0.7)`
     case 'bass':
-      return `n("${ROOTS}").struct("${R(RHYTHM.bass[e][synco])}").scale("${at('bass')}").s("${inst}").lpf(${Math.min(lpf, 1800)}).gain(0.9)`
+      return `n("${ROOTS}").struct("${hold(RHYTHM.bass[e][synco])}").scale("${at('bass')}").s("${inst}").lpf(${Math.min(lpf, 1800)}).gain(0.9)`
+    // Drums and bass stay dry; the rest shares one reverb.
     case 'chords':
-      return `n("${TRIADS}").struct("${R(RHYTHM.chords[e][synco])}").scale("${at('chords')}").s("${inst}").lpf(${lpf}).decay(0.3).sustain(0.4).gain(0.55)`
+      return `n("${TRIADS}").struct("${hold(RHYTHM.chords[e][synco])}").scale("${at('chords')}").s("${inst}").lpf(${lpf}).decay(0.3).sustain(0.4).room(0.3).gain(0.55)`
     case 'melody':
-      return `n("${R(MELODY[r.mood][e >= 2 ? 1 : 0])}".add(${v * 2})).scale("${at('melody')}").s("${inst}").lpf(${lpf}).gain(0.75)`
+      return `n("${R(MELODY[r.mood][e >= 2 ? 1 : 0])}".add(${v * 2})).scale("${at('melody')}").s("${inst}").lpf(${lpf}).room(0.3).gain(0.75)`
     case 'texture':
-      return `n("${TRIADS}").struct("${e >= 3 ? 'x ~ x ~' : 'x'}").scale("${at('texture')}").s("${inst}").attack(0.6).release(2).lpf(${lpf}).gain(0.45)`
+      return `n("${TRIADS}").struct("${e >= 3 ? 'x ~ x ~' : 'x'}").scale("${at('texture')}").s("${inst}").attack(0.6).release(2).lpf(${lpf}).room(0.3).gain(0.45)`
   }
 }
 
