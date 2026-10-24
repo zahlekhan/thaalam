@@ -34,13 +34,13 @@ Participate solo or in a team of up to 4. Remove unused rows.
 
 ## Submission checklist
 
-- [ ] The project implementation started from scratch at the event.
-- [ ] I participated solo or with no more than 4 team members in total.
-- [ ] AI tool usage during development is documented.
-- [ ] The code repository URL, short description, and working demo are provided.
-- [ ] README setup and demo instructions match the submitted code.
-- [ ] Actual checks and known limitations are documented.
-- [ ] Meaningful changes are documented and committed throughout development.
-- [ ] The final implementation is committed and pushed, and its SHA is recorded above.
-- [ ] No credentials or private data are included in the repository or demo instructions.
-- [ ] The organizers' announced submission method and timing have been followed.
+- [x] The project implementation started from scratch at the event.
+- [x] I participated solo or with no more than 4 team members in total.
+- [x] AI tool usage during development is documented.
+- [x] The code repository URL, short description, and working demo are provided.
+- [x] README setup and demo instructions match the submitted code.
+- [x] Actual checks and known limitations are documented.
+- [x] Meaningful changes are documented and committed throughout development.
+- [x] The final implementation is committed and pushed, and its SHA is recorded above.
+- [x] No credentials or private data are included in the repository or demo instructions.
+- [x] The organizers' announced submission method and timing have been followed.
