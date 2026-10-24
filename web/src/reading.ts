@@ -132,11 +132,36 @@ export function combine(m: ModelReading | null, p: Pixels): Reading {
 
 export const API_URL: string = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
 
+// The server refused the photo itself (nudity/profanity), not just the reading.
+export class PhotoRejected extends Error {}
+
 export async function askModel(src: string, model: string): Promise<ModelReading> {
   const blob = await (await fetch(src)).blob()
   const form = new FormData()
   form.append('photo', blob, 'photo.jpg')
   const r = await fetch(`${API_URL}/api/analyze?model=${encodeURIComponent(model)}`, { method: 'POST', body: form })
-  if (!r.ok) throw new Error(`analyze failed: ${r.status}`)
+  if (!r.ok) {
+    let detail = `analyze failed: ${r.status}`
+    try {
+      detail = (await r.json()).detail ?? detail
+    } catch {}
+    if (r.status === 422) throw new PhotoRejected(detail)
+    throw new Error(detail)
+  }
   return r.json()
+}
+
+// Store a cleared photo in R2 and get back its permanent URL. Falls back to
+// the inline data URL when upload isn't available (local dev without R2).
+export async function uploadPhoto(src: string): Promise<string> {
+  try {
+    const blob = await (await fetch(src)).blob()
+    const form = new FormData()
+    form.append('photo', blob, 'photo.jpg')
+    const r = await fetch(`${API_URL}/api/photos`, { method: 'POST', body: form })
+    if (r.ok) return (await r.json()).url
+  } catch (e) {
+    console.warn(e)
+  }
+  return src
 }

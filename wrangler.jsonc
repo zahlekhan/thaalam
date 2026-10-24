@@ -8,10 +8,21 @@
     "directory": "./web/dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/parties/*"]
+    "run_worker_first": ["/api/*", "/parties/*", "/photos/*"]
   },
+  // Uploaded photos (JPEG, <=512px). Permanent — public rooms link here.
+  "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "thaalam-photos" }],
   // Rooms: one Durable Object per room holds the shared canvas (Yjs).
-  "durable_objects": { "bindings": [{ "name": "Room", "class_name": "Room" }] },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
+  // Gallery: one Durable Object listing rooms that were shared publicly.
+  "durable_objects": {
+    "bindings": [
+      { "name": "Room", "class_name": "Room" },
+      { "name": "Gallery", "class_name": "Gallery" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Room"] },
+    { "tag": "v2", "new_sqlite_classes": ["Gallery"] }
+  ],
   "observability": { "enabled": true, "head_sampling_rate": 1 }
 }
