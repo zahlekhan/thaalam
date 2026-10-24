@@ -43,7 +43,12 @@ export class Room extends YServer {
   async onRequest(request) {
     const url = new URL(request.url);
     if (request.method === "POST" && url.pathname === "/publish") {
+      let name = "";
+      try {
+        name = String((await request.json()).name ?? "").slice(0, 80);
+      } catch {}
       await this.ctx.storage.put("published", true);
+      await this.ctx.storage.put("canvasName", name);
       await this.registerWithGallery();
       return json({ ok: true });
     }
@@ -53,7 +58,10 @@ export class Room extends YServer {
       return json({ ok: true });
     }
     if (request.method === "GET") {
-      return json({ published: !!(await this.ctx.storage.get("published")) });
+      return json({
+        published: !!(await this.ctx.storage.get("published")),
+        name: (await this.ctx.storage.get("canvasName")) ?? "",
+      });
     }
     return new Response("Not found", { status: 404 });
   }
@@ -82,6 +90,7 @@ export class Room extends YServer {
         method: "POST",
         body: JSON.stringify({
           room: this.name,
+          name: (await this.ctx.storage.get("canvasName")) ?? "",
           cards: this.document.getMap("cards").size,
           previews,
           names: [...names].slice(0, 3),
@@ -100,7 +109,7 @@ export class Gallery extends Server {
       "CREATE TABLE IF NOT EXISTS rooms (room TEXT PRIMARY KEY, at INTEGER NOT NULL, cards INTEGER NOT NULL, previews TEXT NOT NULL)"
     );
     // Added later: who made the canvas and its mood. Older tables get the columns here.
-    for (const col of ["names TEXT NOT NULL DEFAULT '[]'", "mood TEXT NOT NULL DEFAULT ''"]) {
+    for (const col of ["names TEXT NOT NULL DEFAULT '[]'", "mood TEXT NOT NULL DEFAULT ''", "name TEXT NOT NULL DEFAULT ''"]) {
       try {
         this.ctx.storage.sql.exec(`ALTER TABLE rooms ADD COLUMN ${col}`);
       } catch {
@@ -116,21 +125,22 @@ export class Gallery extends Server {
         this.ctx.storage.sql.exec("DELETE FROM rooms WHERE room = ?", body.room);
       } else {
         this.ctx.storage.sql.exec(
-          "INSERT INTO rooms (room, at, cards, previews, names, mood) VALUES (?, ?, ?, ?, ?, ?) " +
+          "INSERT INTO rooms (room, at, cards, previews, names, mood, name) VALUES (?, ?, ?, ?, ?, ?, ?) " +
             "ON CONFLICT(room) DO UPDATE SET at = excluded.at, cards = excluded.cards, previews = excluded.previews, " +
-            "names = excluded.names, mood = excluded.mood",
+            "names = excluded.names, mood = excluded.mood, name = excluded.name",
           body.room,
           body.at ?? Date.now(),
           body.cards ?? 0,
           JSON.stringify(body.previews ?? []),
           JSON.stringify(body.names ?? []),
-          body.mood ?? ""
+          body.mood ?? "",
+          body.name ?? ""
         );
       }
       return json({ ok: true });
     }
     const rows = this.ctx.storage.sql
-      .exec("SELECT room, at, cards, previews, names, mood FROM rooms ORDER BY at DESC LIMIT 200")
+      .exec("SELECT room, at, cards, previews, names, mood, name FROM rooms ORDER BY at DESC LIMIT 200")
       .toArray();
     return json({ rooms: rows.map((r) => ({ ...r, previews: JSON.parse(r.previews), names: JSON.parse(r.names) })) });
   }
@@ -341,12 +351,19 @@ function servePhoto(env, url) {
 // /api/rooms/<id>          → { published }
 // /api/rooms/<id>/publish  → mark public, add to gallery
 // /api/rooms/<id>/unpublish
-function roomAction(request, env, url) {
+async function roomAction(request, env, url) {
   const m = url.pathname.match(/^\/api\/rooms\/([^/]+)(\/publish|\/unpublish)?$/);
   if (!m) return json({ detail: "Not found" }, 404);
   const stub = env.Room.get(env.Room.idFromName(m[1]));
   const path = m[2] ?? "/status";
-  return stub.fetch(new Request(`https://room${path}`, { method: request.method }));
+  const body = request.method === "POST" ? await request.text() : undefined;
+  return stub.fetch(
+    new Request(`https://room${path}`, {
+      method: request.method,
+      headers: { "Content-Type": "application/json" },
+      body,
+    })
+  );
 }
 
 export default {

@@ -23,6 +23,7 @@ import {
 import { dismissToast, toast, useToast } from './toast'
 import {
   BackIcon,
+  CameraIcon,
   CloseIcon,
   MuteIcon,
   SoundIcon,
@@ -466,7 +467,17 @@ function BottomBar({
           <MoreIcon size={22} />
         </button>
       </nav>
-      {sheet === 'more' && <MoreMenu onClose={close} onCode={() => setSheet('code')} />}
+      {DEV && (
+        <button
+          className="debug-code"
+          onClick={() => setSheet(sheet === 'code' ? null : 'code')}
+          aria-label="See the generated Strudel code"
+          title="See the code"
+        >
+          <CodeIcon size={18} />
+        </button>
+      )}
+      {sheet === 'more' && <MoreMenu onClose={close} />}
       {sheet === 'add' && <AddSheet onClose={close} onFiles={onFiles} onSample={onSample} />}
       {sheet === 'invite' && <InviteSheet onClose={close} peers={peers} />}
       {sheet === 'code' && <CodeSheet onClose={close} />}
@@ -500,7 +511,9 @@ function SheetFrame({ title, onClose, children }: { title: string; onClose: () =
 
 function AddSheet({ onClose, onFiles, onSample }: { onClose: () => void; onFiles: (f: File[]) => void; onSample: (s: Sample) => void }) {
   const [samples, setSamples] = useState<Sample[] | null>(null)
+  const [camera, setCamera] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const captureRef = useRef<HTMLInputElement>(null)
   useEffect(() => {
     fetch('/samples/samples.json')
       .then((r) => (r.ok ? r.json() : []))
@@ -508,25 +521,34 @@ function AddSheet({ onClose, onFiles, onSample }: { onClose: () => void; onFiles
       .catch(() => setSamples([]))
   }, [])
   const scene = (file: string) => file.replace(/\.\w+$/, '')
+  const picked = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFiles(Array.from(e.target.files ?? []))
+    e.target.value = ''
+    onClose()
+  }
   return (
     <SheetFrame title="Add a photo" onClose={onClose}>
       <button className="big-btn" data-autofocus onClick={() => fileRef.current?.click()}>
         <PhotoIcon size={22} />
         Choose photos
       </button>
+      <button className="big-btn" onClick={() => (hasLiveCamera() ? setCamera(true) : captureRef.current?.click())}>
+        <CameraIcon size={22} />
+        Take a photo
+      </button>
       <p className="hint">Or drop or paste photos anywhere on the fridge.</p>
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/*"
-        multiple
-        hidden
-        onChange={(e) => {
-          onFiles(Array.from(e.target.files ?? []))
-          e.target.value = ''
-          onClose()
-        }}
-      />
+      <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={picked} />
+      <input ref={captureRef} type="file" accept="image/*" capture="environment" hidden onChange={picked} />
+      {camera && (
+        <Camera
+          onClose={() => setCamera(false)}
+          onShot={(blob) => {
+            setCamera(false)
+            onFiles([new File([blob], 'camera.jpg', { type: blob.type || 'image/jpeg' })])
+            onClose()
+          }}
+        />
+      )}
       <h3>Try a sample</h3>
       {samples === null ? (
         <p className="hint">Loading samples…</p>
@@ -577,6 +599,7 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
   const [copied, setCopied] = useState(false)
   const [isPublic, setIsPublic] = useState<boolean | null>(null)
   const [confirming, setConfirming] = useState(false)
+  const [canvasName, setCanvasName] = useState('')
   const linkRef = useRef<HTMLInputElement>(null)
 
   // Opening the invite turns a solo canvas into a room; whatever is on it carries over.
@@ -588,7 +611,10 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
     if (!room) return
     fetch(`${API_URL}/api/rooms/${room}`)
       .then((r) => r.json())
-      .then((s) => setIsPublic(!!s.published))
+      .then((s) => {
+        setIsPublic(!!s.published)
+        if (s.name) setCanvasName(s.name)
+      })
       .catch(() => setIsPublic(false))
   }, [room])
 
@@ -607,7 +633,11 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
 
   const setListing = async (publish: boolean) => {
     try {
-      const r = await fetch(`${API_URL}/api/rooms/${room}/${publish ? 'publish' : 'unpublish'}`, { method: 'POST' })
+      const r = await fetch(`${API_URL}/api/rooms/${room}/${publish ? 'publish' : 'unpublish'}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: canvasName.trim() }),
+      })
       if (!r.ok) throw new Error(`${r.status}`)
       setIsPublic(publish)
       setConfirming(false)
@@ -657,6 +687,15 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
               <b>List this canvas in the public gallery?</b> Anyone can open it and see these photos. You can remove it any
               time.
             </p>
+            <label className="canvas-name">
+              Name in the gallery (optional)
+              <input
+                value={canvasName}
+                onChange={(e) => setCanvasName(e.target.value)}
+                placeholder="e.g. Friday night jam"
+                maxLength={80}
+              />
+            </label>
             <div className="row">
               <button className="primary-btn" onClick={() => setListing(true)}>
                 List it publicly
@@ -677,7 +716,7 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
   )
 }
 
-function MoreMenu({ onClose, onCode }: { onClose: () => void; onCode: () => void }) {
+function MoreMenu({ onClose }: { onClose: () => void }) {
   const [models, setModels] = useState<string[]>([])
   const [model, setModel] = useState(currentModel)
   useEffect(() => {
@@ -699,10 +738,6 @@ function MoreMenu({ onClose, onCode }: { onClose: () => void; onCode: () => void
     <>
       <div className="menu-backdrop" onClick={onClose} />
       <div className="menu" role="menu">
-        <button role="menuitem" onClick={onCode} autoFocus>
-          <CodeIcon size={20} />
-          See the code
-        </button>
         <a role="menuitem" href="/gallery">
           <GalleryIcon size={20} />
           Public gallery
@@ -809,7 +844,15 @@ function ToastView() {
   )
 }
 
-type GalleryRoom = { room: string; at: number; cards: number; previews: string[]; names?: string[]; mood?: string }
+type GalleryRoom = {
+  room: string
+  at: number
+  cards: number
+  previews: string[]
+  names?: string[]
+  mood?: string
+  name?: string
+}
 
 // "Ravi", "Ravi & Asha", "Ravi, Asha & Mango Kazoo".
 const joinNames = (names: string[]) =>
@@ -864,9 +907,14 @@ function GalleryPage() {
                   ))}
                 </div>
                 <span className="fridge-meta">
-                  <b>{r.names?.length ? joinNames(r.names) : 'A shared fridge'}</b>
+                  <b>{r.name || (r.names?.length ? joinNames(r.names) : 'A shared fridge')}</b>
                   <span>
-                    {[MOOD_WORD[r.mood ?? ''] ?? r.mood, `${r.cards} ${r.cards === 1 ? 'photo' : 'photos'}`, new Date(r.at).toLocaleDateString()]
+                    {[
+                      r.name && r.names?.length ? `by ${joinNames(r.names)}` : '',
+                      MOOD_WORD[r.mood ?? ''] ?? r.mood,
+                      `${r.cards} ${r.cards === 1 ? 'photo' : 'photos'}`,
+                      new Date(r.at).toLocaleDateString(),
+                    ]
                       .filter(Boolean)
                       .join(' · ')}
                   </span>

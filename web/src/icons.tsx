@@ -104,6 +104,13 @@ export const GalleryIcon = (p: IconProps) => (
   </Svg>
 )
 
+export const CameraIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 8h3l1.5-2.5h7L17 8h3a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0120 20H4a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 014 8z" />
+    <circle cx="12" cy="13.5" r="3.2" />
+  </Svg>
+)
+
 export const PhotoIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect x="3.5" y="5" width="17" height="14" rx="2" />

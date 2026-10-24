@@ -267,6 +267,27 @@ p {
 
 /* ---------- Bottom bar ---------- */
 
+.debug-code {
+  position: fixed;
+  right: calc(var(--u) * 2);
+  bottom: calc(max(var(--u) * 2, env(safe-area-inset-bottom)) + 84px);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  box-shadow: var(--lift);
+  cursor: pointer;
+  z-index: 5;
+}
+.debug-code:hover {
+  color: var(--ink);
+}
+
 .bottombar {
   position: fixed;
   left: 50%;
@@ -704,6 +725,23 @@ p {
   display: flex;
   gap: var(--u);
   flex-wrap: wrap;
+}
+.canvas-name {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.canvas-name input {
+  height: 44px;
+  padding: 0 calc(var(--u) * 1.5);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  font-size: 14px;
+  background: var(--paper);
 }
 .text-btn {
   display: inline-flex;
