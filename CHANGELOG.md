@@ -4,6 +4,14 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T02:06:55+05:30 — Photo colour picks the melody's tune
+
+- Changed: A melody card's main colour (hue bucket, 0 to 11) now picks its tune: it starts the mood's melody on one of 4 beats and shifts it by 0, 2 or 4 scale steps, giving 12 tunes per mood and energy. Before, colour only shifted the melody by 0 or 2 steps.
+- Why: Four similar snack photos all read as calm melody and sounded nearly the same; the user chose to let colour vary the tune.
+- Files: `web/src/music.ts`, `CONTEXT.md`.
+- Validation: `npm --prefix web run build` passes. Generated the melody code for 5 hues and checked the tunes differ; played two of them in the app (`npm run dev:worker`): both sounded with no console errors.
+- Limitations: Not judged by ear. Cards with the same role still take turns every 2 bars, so same-role photos never play together.
+
 ## 2026-10-25T01:45:00+05:30 — New tagline: Make music from your photos
 
 - Changed: Page title, Open Graph and Twitter titles now read "Thaalam — make music from your photos"; descriptions lead with the same line. The join sheet's first-screen headline matches.

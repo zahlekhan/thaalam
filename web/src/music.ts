@@ -118,15 +118,22 @@ export function instrumentFor(r: Reading): Sound {
   return INSTRUMENT[r.role][r.texture]
 }
 
-// Palette breaks ties: two photos with the same reading still differ by colour.
-const variantOf = (r: Reading) => r.pixels.hue % 2
+// The photo's main colour picks its tune: it starts the melody on a different beat
+// (4 choices) and a different note (3 choices), so a red and a green photo with the
+// same reading play different tunes.
+function tuneFor(r: Reading, steps: string) {
+  const notes = R(steps).split(' ')
+  const start = (r.pixels.hue % 4) * 4
+  const shift = [0, 2, 4][Math.floor(r.pixels.hue / 4) % 3]
+  return { steps: [...notes.slice(start), ...notes.slice(0, start)].join(' '), shift }
+}
 
 export function partFor(r: Reading, scale: string): string {
   const { name: inst, hits = [0] } = instrumentFor(r)
   const hit = hits[r.pixels.hue % hits.length]
   const e = r.energy - 1
   const synco = r.pixels.busyness > 0.45 ? 1 : 0
-  const v = variantOf(r)
+  const tune = tuneFor(r, MELODY[r.mood][e >= 2 ? 1 : 0])
   const b = r.pixels.brightness
   const lpf = Math.round(500 + b * 5000)
   const shift = b > 0.7 ? 1 : b < 0.25 ? -1 : 0
@@ -144,7 +151,7 @@ export function partFor(r: Reading, scale: string): string {
     case 'chords':
       return `n("${TRIADS}").struct("${hold(RHYTHM.chords[e][synco])}").scale("${at('chords')}").s("${inst}").lpf(${lpf}).decay(0.3).sustain(0.4).room(0.3).gain(0.55)`
     case 'melody':
-      return `n("${R(MELODY[r.mood][e >= 2 ? 1 : 0])}".add(${v * 2})).scale("${at('melody')}").s("${inst}").lpf(${lpf}).room(0.3).gain(0.75)`
+      return `n("${tune.steps}".add(${tune.shift})).scale("${at('melody')}").s("${inst}").lpf(${lpf}).room(0.3).gain(0.75)`
     case 'texture':
       return `n("${TRIADS}").struct("${e >= 3 ? 'x ~ x ~' : 'x'}").scale("${at('texture')}").s("${inst}").attack(0.6).release(2).lpf(${lpf}).room(0.3).gain(0.45)`
   }
