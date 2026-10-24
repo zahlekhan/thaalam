@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T00:00:00+05:30 — Merge react-flow-rooms into main, deploy to Cloudflare
+
+- Changed: Merged `origin/main` (logging, camera capture, Options menu) with `react-flow-rooms` (permanent rooms, photos in R2, safety moderation, public gallery). Conflict resolutions: `worker/index.js` keeps persistent rooms + Gallery and adds main's structured logging and robust Jev reply parsing; `App.tsx` keeps Camera, publish/gallery UI, and `PhotoRejected` handling, dropping the top-bar Code button and `DEV` model select (now covered by the Options menu); `styles.css`, `server/app.py`, `AI_USAGE.md`, `CHANGELOG.md` keep both sides.
+- Why: Deploy the full feature set to `main`.
+- Validation: `npm --prefix web run build`, `npx tsc -b`, `node --check worker/index.js`, `python3 -m py_compile server/app.py` passed. `wrangler deploy` succeeded; `/api/health` returns `{"ok":true,"models":["jev"]}` and `/api/gallery` returns an empty room list.
+- Limitations: Gallery returned no published rooms after deploy. Merge exercised endpoints only; room sync and camera flow not re-tested end to end on the deployed worker.
+
 ## 2026-10-24T22:35:18+05:30 — Record the new card interaction in product context
 
 - Changed: `PRODUCT.md` now describes the scattered canvas instead of the stage. Every card plays unless muted. Drag moves a card; click or tap opens its actions (mute or unmute, delete). The stage frame and parking are gone from the terminology and principles.
