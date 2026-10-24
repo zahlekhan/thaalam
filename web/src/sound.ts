@@ -10,10 +10,12 @@ export function startSound() {
   // Create/resume the AudioContext now, inside the gesture. initStrudel defers this to a document
   // mousedown listener, but pane mousedowns are swallowed by d3-zoom before they reach document —
   // so a tap on empty canvas stayed silent until the click happened to land on a card.
-  initAudio()
-  ready ??= initStrudel({
-    prebake: () => Promise.all([samples('github:tidalcycles/dirt-samples'), registerSoundfonts()]),
-  })
+  ready ??= (async () => {
+    await initAudio()
+    return initStrudel({
+      prebake: () => Promise.all([samples('github:tidalcycles/dirt-samples'), registerSoundfonts()]),
+    })
+  })()
   return ready
 }
 
