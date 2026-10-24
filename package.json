@@ -1,0 +1,13 @@
+{
+  "name": "thaalam",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "npm --prefix web run build",
+    "deploy": "npm run build && wrangler deploy",
+    "dev:worker": "npm run build && wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.132.0"
+  }
+}
