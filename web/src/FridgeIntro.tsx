@@ -85,10 +85,12 @@ function build(canvas: HTMLCanvasElement) {
   scene.add(prints)
   const loader = new THREE.TextureLoader()
   const paper = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.8 })
-  const dome = new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2)
+  // A flat plastic button magnet with a rounded rim, not a pin: turned from its side profile.
+  const rim = [[0, 0], [1, 0], [1, 0.16], [0.97, 0.26], [0.88, 0.32], [0, 0.33]].map(([x, y]) => new THREE.Vector2(x, y))
+  const disc = new THREE.LatheGeometry(rim, 40)
   const placeMagnet = (parent: THREE.Object3D, color: string, x: number, y: number, r: number) => {
-    const m = new THREE.Mesh(dome, new THREE.MeshPhysicalMaterial({ color, roughness: 0.25, clearcoat: 1 }))
-    m.scale.set(r, r, r * 0.7)
+    const m = new THREE.Mesh(disc, new THREE.MeshPhysicalMaterial({ color, roughness: 0.45, clearcoat: 0.4, clearcoatRoughness: 0.3 }))
+    m.scale.setScalar(r)
     m.rotation.x = Math.PI / 2
     m.position.set(x, y, 0.004)
     m.castShadow = true
@@ -99,13 +101,7 @@ function build(canvas: HTMLCanvasElement) {
     prints.clear()
     prints.position.x = 0
     const list = Array.from(cards.values()).slice(0, 12)
-    if (!list.length) {
-      // An empty door still has a few magnets waiting for photos.
-      ;['kick', 'percussion', 'bass', 'chords', 'melody', 'texture'].forEach((role, i) =>
-        placeMagnet(prints, token(role), -0.22 + (i % 3) * 0.2 + (i % 2) * 0.03, 0.34 - Math.floor(i / 3) * 0.15 + ((i * 7) % 3) * 0.025, 0.038)
-      )
-      return
-    }
+    if (!list.length) return // an empty door stays clean enamel
     const xs = list.map((c) => c.x), ys = list.map((c) => c.y)
     const x0 = Math.min(...xs), x1 = Math.max(...xs) + CARD_W
     const y0 = Math.min(...ys), y1 = Math.max(...ys) + CARD_H
@@ -137,7 +133,7 @@ function build(canvas: HTMLCanvasElement) {
         print.add(pic)
       }
       const reading = c.status === 'ready' && !c.muted ? readingOf(c) : null
-      placeMagnet(print, token(reading ? reading.role : 'magnet-idle'), 0, ph / 2 - pw * 0.02, pw * 0.11)
+      placeMagnet(print, token(reading ? reading.role : 'magnet-idle'), 0, ph / 2 - pw * 0.02, pw * 0.12)
       prints.add(print)
     })
   }

@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T01:53:00+05:30 — Fridge intro: disc magnets, no loose pins
+
+- Changed: Print magnets on the 3D fridge are flat plastic discs with a rounded rim instead of squashed spheres, and the empty door no longer shows six loose magnets. Files: `web/src/FridgeIntro.tsx`, `DESIGN.md`.
+- Why: The user disliked the pin-like magnets.
+- Validation: `tsc -b` passes; headless Chrome captures of the empty door, a room's door and the flight.
+- Limitations: None new.
+
 ## 2026-10-25T01:46:00+05:30 — 3D fridge intro on the join screen
 
 - Changed: New `web/src/FridgeIntro.tsx` draws a 3D fridge with Three.js behind the join sheet, wearing the room's real photos and magnets in their canvas layout. On join the camera flies into the door and fades onto the canvas. It loads as a separate chunk (about 138 KB gzipped), so the join sheet never waits; joining before it loads skips it. Colours come from the CSS tokens. `App.tsx` mounts it, `styles.css` clears the join backdrop and moves the sheet left on wide screens while the fridge shows. Added `three` and `@types/three`.
