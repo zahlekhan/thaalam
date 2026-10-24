@@ -121,11 +121,13 @@ export function combine(m: ModelReading | null, p: Pixels): Reading {
   }
 }
 
+export const API_URL: string = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
+
 export async function askModel(src: string, model: string): Promise<ModelReading> {
   const blob = await (await fetch(src)).blob()
   const form = new FormData()
   form.append('photo', blob, 'photo.jpg')
-  const r = await fetch(`/api/analyze?model=${encodeURIComponent(model)}`, { method: 'POST', body: form })
+  const r = await fetch(`${API_URL}/api/analyze?model=${encodeURIComponent(model)}`, { method: 'POST', body: form })
   if (!r.ok) throw new Error(`analyze failed: ${r.status}`)
   return r.json()
 }

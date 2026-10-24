@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Tldraw, createShapeId, useEditor, type Editor, type TLShapeId } from 'tldraw'
 import { CardUtil, readingOf, type CardShape } from './CardShape'
-import { askModel, measurePixels, shrink, type ModelReading } from './reading'
+import { API_URL, askModel, measurePixels, shrink, type ModelReading } from './reading'
 import { mixFor } from './music'
 import { play, startSound } from './sound'
 
@@ -121,7 +121,7 @@ function Overlay() {
       .then((r) => (r.ok ? r.json() : []))
       .then(setSamples)
       .catch(() => setSamples([]))
-    fetch('/api/health')
+    fetch(`${API_URL}/api/health`)
       .then((r) => r.json())
       .then((h: { default: string; models: string[] }) => {
         setModels(h.models)

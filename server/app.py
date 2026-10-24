@@ -13,6 +13,7 @@ import uuid
 
 import httpx
 from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image, ImageOps
 
 PROVIDER = os.environ.get("THAALAM_PROVIDER", "jev")  # default model
@@ -69,6 +70,12 @@ QUESTIONS = {
 }
 
 app = FastAPI(title="Thaalam")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "*").split(",") if o.strip()],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 _vega = None
 
 
