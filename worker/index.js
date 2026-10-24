@@ -196,6 +196,81 @@ const JEV_QUESTIONS = {
       texture: "wide, soft, empty, sky, background atmosphere",
     },
   },
+  // The photo's gist (see CONTEXT.md).
+  space: {
+    type: "choice",
+    instructions: "How open is the space in `photo`?",
+    criteria: {
+      open: "wide, far away, horizon, sky, landscape",
+      room: "a room, street or scene at an everyday distance",
+      close: "close-up, one thing near the camera, little background",
+    },
+  },
+  gesture: {
+    type: "choice",
+    instructions: "What is the main direction of the shapes and lines in `photo`?",
+    criteria: {
+      rising: "upward, tall, towers, trees, climbing lines",
+      falling: "downward, hanging, dripping, sloping down",
+      level: "flat, horizontal, horizon, lying down",
+      round: "circular, curved, swirling, wrapped shapes",
+      scattered: "shapes pointing every way, no main line",
+    },
+  },
+  order: {
+    type: "choice",
+    instructions: "How ordered is `photo`?",
+    criteria: {
+      ordered: "symmetric, neat, a repeating pattern or grid",
+      balanced: "a natural arrangement with some order",
+      chaotic: "cluttered, messy, random, crowded",
+    },
+  },
+  weight: {
+    type: "choice",
+    instructions: "How heavy or light does `photo` feel?",
+    criteria: {
+      heavy: "massive, solid, dark, imposing",
+      medium: "an ordinary weight",
+      light: "delicate, airy, small, floating, thin",
+    },
+  },
+  focus: {
+    type: "choice",
+    instructions: "How many things does `photo` focus on?",
+    criteria: {
+      one: "one clear subject",
+      few: "two or three subjects",
+      many: "many subjects, a crowd or a collection",
+    },
+  },
+  light: {
+    type: "choice",
+    instructions: "What is the light like in `photo`?",
+    criteria: {
+      dawn: "soft early light, pale, misty, fresh",
+      day: "plain daylight, clear and even",
+      golden: "warm low sun, sunset, golden glow",
+      night: "dark, night, moonlight, deep shadow",
+      artificial: "lamps, neon, indoor lights, screens, flash",
+    },
+  },
+  motion: {
+    type: "choice",
+    instructions: "Is `photo` still or moving?",
+    criteria: {
+      still: "frozen, posed, nothing moving",
+      moving: "motion, blur, flowing water, people walking, wind",
+    },
+  },
+  surface: {
+    type: "choice",
+    instructions: "What do the main surfaces in `photo` feel like?",
+    criteria: {
+      smooth: "smooth, glossy, soft, clean",
+      rough: "rough, gritty, grainy, sand, stone, rust, worn",
+    },
+  },
   safety: {
     type: "choice",
     instructions: "Does `photo` show nudity, sexual content, or profanity (rude words, obscene gestures)?",

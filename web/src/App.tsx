@@ -318,14 +318,16 @@ function SelectionBar({ nodes, onDone }: { nodes: CardNode[]; onDone: () => void
   const picked = nodes.filter((n) => n.selected && n.data.status === 'ready')
   if (!picked.length) return null
   const one = picked.length === 1 ? picked[0].data : null
+  const info = one ? describe(one) : null
   const allMuted = picked.every((n) => n.data.muted)
   const thumb = one ? (photos.get(one.id) ?? pendingPhotos.get(one.id)) : null
   return (
     <div className="selection" role="toolbar" aria-label="Selected photo">
       {thumb && <img src={thumb} alt="" />}
       <span className="selection-name">
-        <b>{one ? describe(one).title : `${picked.length} photos`}</b>
-        <span>{one ? describe(one).line : 'selected'}</span>
+        <b>{info ? info.title : `${picked.length} photos`}</b>
+        <span>{info ? info.line : 'selected'}</span>
+        {info?.gist ? <span>{info.gist}</span> : null}
       </span>
       <button onClick={() => picked.forEach((n) => (allMuted || !n.data.muted) && toggleMute(n.id))}>
         {allMuted ? <SoundIcon size={20} /> : <MuteIcon size={20} />}

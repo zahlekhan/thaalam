@@ -4,6 +4,14 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T02:35:27+05:30 — Photo gist and colour mood write the motif
+
+- Changed: A photo's gist now shapes how its part plays, and the colour field votes on the mood. Eight new model questions (space, gesture, order, weight, focus, light, motion, surface) are asked by the local server and the Worker. Pixels now measure saturation, hue clash and edge sharpness. `music.ts` builds the melody from the gesture, the rhythm from order, the room from how open the photo is, the register from weight, holds or short notes from motion, a harmony from how many subjects there are, grit from the surface, and the chord from the light. Vivid colour nudges energy; the colours' own mood votes on the scale, with less weight than the model's mood. The colour-family melody rhythms are gone. Cards show space, gesture and surface under the mood. The six sample readings were re-read with Jev.
+- Why: Similar photos were sounding the same because colour was inventing a difference. The agreed theory is to interpret the whole photo (gist in, motif out) and let colour set the feeling.
+- Files: `server/app.py`, `worker/index.js`, `web/src/reading.ts`, `web/src/music.ts`, `web/src/CardShape.tsx`, `web/src/App.tsx`, `web/src/styles.css`, `web/public/samples/samples.json`, `CONTEXT.md`, `PRODUCT.md`, `README.md`.
+- Validation: `npm --prefix web run build` passes. Generated a part for each of the six samples from their Jev answers and measured pixels: the strings differ, and melody harmony sits after `n()` closes. Five hand-built gist combinations each produced a different melody. In headless Chrome at 1280×800 and 390×844, added the chai and crowd samples: cards show "close · level · smooth" and "room · rising · rough" inside the print, and the selection bar shows the same line. The gist text is not cut off on the card. Sound was left off, so this was not checked by ear.
+- Limitations: Not listened to by ear. Cards saved before this change have no gist answers, so their gist falls back to a plain pixel guess until the photo is added again. Colour measurements are taken when the photo is added, so older cards use neutral defaults for saturation, clash and sharpness.
+
 ## 2026-10-25T02:13:29+05:30 — Colour picks the melody's rhythm
 
 - Changed: The melody tune from the previous entry was still too close between photos, so colour now changes rhythm, not just start beat and pitch. The colour family (reds, greens, blues, purples) picks one of 4 melody rhythms: steady, off-beat, long notes or quick runs. Within a family the mood's notes play forwards, backwards or two steps higher. Energy and mood still pick the notes.

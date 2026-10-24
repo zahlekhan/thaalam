@@ -190,6 +190,10 @@ p {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.card-label .gist {
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
 
 .card.muted .magnet {
   background-color: var(--magnet-idle);

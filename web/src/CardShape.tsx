@@ -32,13 +32,15 @@ export function readingOf(card: Pick<CardData, 'pixels' | 'model'>) {
 export function describe(card: CardData) {
   const reading = card.status === 'ready' ? readingOf(card) : null
   if (!reading) {
-    return { title: 'Listening…', line: card.by ? `added by ${card.by}` : 'reading the photo', label: 'Photo being read' }
+    return { title: 'Listening…', line: card.by ? `added by ${card.by}` : 'reading the photo', gist: '', label: 'Photo being read' }
   }
   const title = instrumentFor(reading).label
   const mood = reading.guessed ? `${reading.mood}, a guess` : reading.mood
   const line = [card.muted ? 'muted' : mood, card.by].filter(Boolean).join(' · ')
-  const label = `${title}, ${mood}, ${card.muted ? 'muted' : 'playing'}${card.by ? `, added by ${card.by}` : ''}`
-  return { title, line, label }
+  // The three gist words you can check by looking: how open, which way it moves, how the surface feels.
+  const gist = `${reading.gist.space} · ${reading.gist.gesture} · ${reading.gist.surface}`
+  const label = `${title}, ${mood}, ${gist}, ${card.muted ? 'muted' : 'playing'}${card.by ? `, added by ${card.by}` : ''}`
+  return { title, line, gist, label }
 }
 
 export const Card = memo(function Card({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<CardNode>) {
@@ -62,7 +64,7 @@ export const Card = memo(function Card({ data, positionAbsoluteX, positionAbsolu
 
   // Blank until the model clears the photo; the uploader gets a local preview.
   const src = photos.get(data.id) ?? pendingPhotos.get(data.id)
-  const { title, line } = describe(data)
+  const { title, line, gist } = describe(data)
   const color = reading ? ROLE_COLOR[reading.role] : 'var(--magnet-idle)'
 
   return (
@@ -79,6 +81,7 @@ export const Card = memo(function Card({ data, positionAbsoluteX, positionAbsolu
       <div className="card-label">
         <b>{title}</b>
         <span>{line}</span>
+        {gist ? <span className="gist">{gist}</span> : null}
       </div>
     </div>
   )

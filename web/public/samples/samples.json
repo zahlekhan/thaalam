@@ -17,17 +17,57 @@
      },
      "energy": {
       "choice": "5",
-      "prob": 1.0,
+      "prob": 1,
       "unsure": false
      },
      "texture": {
       "choice": "airy",
-      "prob": 0.63,
+      "prob": 0.73,
       "unsure": false
      },
      "role": {
       "choice": "percussion",
       "prob": 0.93,
+      "unsure": false
+     },
+     "space": {
+      "choice": "room",
+      "prob": 0.82,
+      "unsure": false
+     },
+     "gesture": {
+      "choice": "rising",
+      "prob": 0.49,
+      "unsure": false
+     },
+     "order": {
+      "choice": "chaotic",
+      "prob": 1,
+      "unsure": false
+     },
+     "weight": {
+      "choice": "light",
+      "prob": 0.77,
+      "unsure": false
+     },
+     "focus": {
+      "choice": "many",
+      "prob": 0.99,
+      "unsure": false
+     },
+     "light": {
+      "choice": "day",
+      "prob": 0.95,
+      "unsure": false
+     },
+     "motion": {
+      "choice": "moving",
+      "prob": 0.96,
+      "unsure": false
+     },
+     "surface": {
+      "choice": "rough",
+      "prob": 0.87,
       "unsure": false
      }
     }
@@ -47,7 +87,7 @@
     "answers": {
      "mood": {
       "choice": "calm",
-      "prob": 0.79,
+      "prob": 0.8,
       "unsure": false
      },
      "energy": {
@@ -57,13 +97,53 @@
      },
      "texture": {
       "choice": "electronic",
-      "prob": 0.74,
+      "prob": 0.79,
       "unsure": false
      },
      "role": {
       "choice": "bass",
-      "prob": 0.52,
+      "prob": 0.64,
       "unsure": false
+     },
+     "space": {
+      "choice": "room",
+      "prob": 0.91,
+      "unsure": false
+     },
+     "gesture": {
+      "choice": "rising",
+      "prob": 0.41,
+      "unsure": true
+     },
+     "order": {
+      "choice": "balanced",
+      "prob": 0.87,
+      "unsure": false
+     },
+     "weight": {
+      "choice": "heavy",
+      "prob": 0.88,
+      "unsure": false
+     },
+     "focus": {
+      "choice": "one",
+      "prob": 0.62,
+      "unsure": false
+     },
+     "light": {
+      "choice": "night",
+      "prob": 0.64,
+      "unsure": false
+     },
+     "motion": {
+      "choice": "still",
+      "prob": 0.98,
+      "unsure": false
+     },
+     "surface": {
+      "choice": "rough",
+      "prob": 0.6,
+      "unsure": true
      }
     }
    }
@@ -82,12 +162,12 @@
     "answers": {
      "mood": {
       "choice": "calm",
-      "prob": 0.58,
+      "prob": 0.73,
       "unsure": false
      },
      "energy": {
       "choice": "2",
-      "prob": 0.92,
+      "prob": 0.91,
       "unsure": false
      },
      "texture": {
@@ -97,7 +177,47 @@
      },
      "role": {
       "choice": "percussion",
+      "prob": 0.58,
+      "unsure": false
+     },
+     "space": {
+      "choice": "close",
       "prob": 0.71,
+      "unsure": false
+     },
+     "gesture": {
+      "choice": "round",
+      "prob": 0.65,
+      "unsure": false
+     },
+     "order": {
+      "choice": "chaotic",
+      "prob": 0.67,
+      "unsure": false
+     },
+     "weight": {
+      "choice": "heavy",
+      "prob": 0.46,
+      "unsure": true
+     },
+     "focus": {
+      "choice": "many",
+      "prob": 0.83,
+      "unsure": false
+     },
+     "light": {
+      "choice": "artificial",
+      "prob": 0.48,
+      "unsure": false
+     },
+     "motion": {
+      "choice": "still",
+      "prob": 0.67,
+      "unsure": true
+     },
+     "surface": {
+      "choice": "smooth",
+      "prob": 0.99,
       "unsure": false
      }
     }
@@ -117,7 +237,7 @@
     "answers": {
      "mood": {
       "choice": "calm",
-      "prob": 0.87,
+      "prob": 0.88,
       "unsure": false
      },
      "energy": {
@@ -127,13 +247,53 @@
      },
      "texture": {
       "choice": "wooden",
-      "prob": 0.65,
+      "prob": 0.59,
       "unsure": false
      },
      "role": {
       "choice": "melody",
-      "prob": 0.8,
+      "prob": 0.86,
       "unsure": false
+     },
+     "space": {
+      "choice": "close",
+      "prob": 0.71,
+      "unsure": false
+     },
+     "gesture": {
+      "choice": "level",
+      "prob": 0.67,
+      "unsure": false
+     },
+     "order": {
+      "choice": "balanced",
+      "prob": 0.92,
+      "unsure": false
+     },
+     "weight": {
+      "choice": "medium",
+      "prob": 0.65,
+      "unsure": false
+     },
+     "focus": {
+      "choice": "one",
+      "prob": 1,
+      "unsure": false
+     },
+     "light": {
+      "choice": "day",
+      "prob": 0.96,
+      "unsure": false
+     },
+     "motion": {
+      "choice": "still",
+      "prob": 0.91,
+      "unsure": false
+     },
+     "surface": {
+      "choice": "smooth",
+      "prob": 0.51,
+      "unsure": true
      }
     }
    }
@@ -152,22 +312,62 @@
     "answers": {
      "mood": {
       "choice": "calm",
-      "prob": 0.91,
+      "prob": 0.9400000000000001,
       "unsure": false
      },
      "energy": {
       "choice": "2",
-      "prob": 0.93,
+      "prob": 0.94,
       "unsure": false
      },
      "texture": {
       "choice": "organic",
-      "prob": 0.75,
+      "prob": 0.79,
       "unsure": false
      },
      "role": {
       "choice": "chords",
-      "prob": 0.54,
+      "prob": 0.62,
+      "unsure": false
+     },
+     "space": {
+      "choice": "open",
+      "prob": 0.99,
+      "unsure": false
+     },
+     "gesture": {
+      "choice": "level",
+      "prob": 0.92,
+      "unsure": false
+     },
+     "order": {
+      "choice": "balanced",
+      "prob": 0.99,
+      "unsure": false
+     },
+     "weight": {
+      "choice": "light",
+      "prob": 0.49,
+      "unsure": true
+     },
+     "focus": {
+      "choice": "one",
+      "prob": 0.67,
+      "unsure": false
+     },
+     "light": {
+      "choice": "day",
+      "prob": 0.99,
+      "unsure": false
+     },
+     "motion": {
+      "choice": "moving",
+      "prob": 0.75,
+      "unsure": false
+     },
+     "surface": {
+      "choice": "smooth",
+      "prob": 0.87,
       "unsure": false
      }
     }
@@ -187,22 +387,62 @@
     "answers": {
      "mood": {
       "choice": "melancholy",
-      "prob": 0.94,
+      "prob": 0.92,
       "unsure": false
      },
      "energy": {
       "choice": "2",
-      "prob": 0.84,
+      "prob": 0.91,
       "unsure": false
      },
      "texture": {
       "choice": "organic",
-      "prob": 0.79,
+      "prob": 0.83,
       "unsure": false
      },
      "role": {
       "choice": "percussion",
-      "prob": 0.51,
+      "prob": 0.67,
+      "unsure": false
+     },
+     "space": {
+      "choice": "room",
+      "prob": 0.94,
+      "unsure": false
+     },
+     "gesture": {
+      "choice": "falling",
+      "prob": 0.92,
+      "unsure": false
+     },
+     "order": {
+      "choice": "balanced",
+      "prob": 0.8,
+      "unsure": false
+     },
+     "weight": {
+      "choice": "medium",
+      "prob": 0.45999999999999996,
+      "unsure": true
+     },
+     "focus": {
+      "choice": "one",
+      "prob": 0.79,
+      "unsure": false
+     },
+     "light": {
+      "choice": "day",
+      "prob": 0.86,
+      "unsure": false
+     },
+     "motion": {
+      "choice": "moving",
+      "prob": 0.61,
+      "unsure": true
+     },
+     "surface": {
+      "choice": "smooth",
+      "prob": 0.97,
       "unsure": false
      }
     }

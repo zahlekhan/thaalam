@@ -26,31 +26,41 @@ With friends:
 ## Glossary
 
 - **Card**: a photo plus its reading and the part it plays.
-- **Reading**: what we learn about a photo. Code reads brightness, warmth, busyness and palette from pixels. The model reads mood, energy, texture and role.
+- **Reading**: what we learn about a photo. Code reads brightness, warmth, busyness, palette, saturation, colour clash and edge sharpness from pixels. The model reads mood, energy, texture, role, and the photo's gist.
 - **Role**: kick, percussion, bass, chords, melody or texture. Fixed per photo.
 - **Stage**: the frame on the canvas. Cards inside play.
 - **Mix**: everything on the stage, sharing one tempo, key and scale.
 
 ## Photo to sound
 
+The model reads the gist of the whole photo. Code builds a motif from those answers. Colour is measured from the pixels and votes on the feeling, the way a field of colour sets a mood. Cards show three gist words under the mood: space, gesture and surface.
+
 | Reading | Controls |
 |---|---|
 | role | which part the card plays |
 | texture (wooden, organic, metallic, electronic, airy) x role | instrument (30, one per role and texture) |
-| energy 1 to 5 | which pattern from the role's menu (sparse to busy) |
-| busyness | straight or syncopated variant |
-| brightness | register and filter (dark photos sound darker) |
-| mood | melody shape, plus a vote on the mix's scale |
-| main colour | melody rhythm by colour family (steady, off-beat, long notes, quick runs), then forwards, backwards or higher |
-| palette | breaks ties between similar readings |
+| energy 1 to 5 | which pattern from the role's menu (sparse to busy). Vivid colour nudges this up a step, grey colour down |
+| gist order | straight rhythm when ordered, syncopated when chaotic. The melody has its own rhythm for ordered, balanced and chaotic |
+| gist gesture | melody shape: rising, falling, level, an arch (round), or scattered |
+| gist space | how wide the melody leaps, and how much reverb the part gets. Open is wide and echoey, a close-up is stepwise and dry |
+| gist weight, brightness, night light | register. Light, bright photos play higher; heavy, dark and night photos play lower |
+| gist motion | still photos hold each note until the next one. Moving photos play them short |
+| gist focus | one subject is a single line. A few or many subjects add a harmony |
+| gist surface | rough surfaces get a gritty, crushed tone. Smooth stays clean |
+| gist light | chord colour: suspended at dawn, a plain triad by day, a warm seventh at golden hour, a ninth at night, open fifths under artificial light |
+| edge sharpness | soft, blurry photos swell in. Hard edges attack normally |
+| colour clash | colours from all around the wheel add a tense note to the chord |
+| mood, plus the mood the colours suggest | a vote on the mix's scale. Colour's vote is smaller than a confident model answer |
+| hue | which drum hit, when that instrument has more than one |
+| palette | measured and stored. It does not pick the tune |
 
 Mix level:
 
 - Tempo: average energy, 80 to 128 BPM.
-- Scale: mood vote. calm = major pentatonic, happy = major, tense = phrygian, festive = mixolydian, melancholy = minor.
+- Scale: mood vote, with a smaller vote from the colour mood. calm = major pentatonic, happy = major, tense = phrygian, festive = mixolydian, melancholy = minor.
 - Key: fixed for now.
 - All cards play at the same volume for now.
-- Bass and chord notes ring until the next note. Chords, melody and pads share one light reverb; drums and bass stay dry. Percussion is accented on the beat.
+- Still photos hold bass, chord and melody notes until the next note. Reverb follows how open the photo is: open photos echo, close-ups stay dry. Percussion is accented on the beat.
 - Two cards with the same role take turns every 2 bars.
 
 Patterns come from small hand-written menus per role. The model picks readings; code picks and plays patterns. Melodic parts are written in scale degrees so they fit any key.

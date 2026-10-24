@@ -1,7 +1,7 @@
-// Readings in, Strudel code out. The model never writes music: it picks readings,
-// and these menus decide what can be played.
+// Readings in, Strudel code out. The model never writes music: it reads the photo's gist
+// and mood, and these menus decide what can be played. See "Photo to sound" in CONTEXT.md.
 
-import type { Mood, Reading, Role, Texture } from './reading'
+import type { Gist, Mood, Reading, Role, Texture } from './reading'
 
 export type PlayingCard = { id: string; reading: Reading }
 
@@ -15,14 +15,28 @@ const SCALE: Record<Mood, string> = {
 }
 
 // Chord roots per bar, as scale degrees. Shared by bass, chords and pads.
-const ROOTS = '<0 5 3 4>'
-const TRIADS = '<[0,2,4] [5,7,9] [3,5,7] [4,6,8]>'
+const ROOT_LIST = [0, 5, 3, 4]
+const ROOTS = `<${ROOT_LIST.join(' ')}>`
+
+// Chord colour from the photo's light, as scale degrees above each root.
+const VOICING: Record<Gist['light'], number[]> = {
+  dawn: [0, 1, 4], // suspended, waiting to resolve
+  day: [0, 2, 4], // plain triad
+  golden: [0, 2, 4, 6], // warm seventh
+  night: [0, 2, 4, 8], // added ninth, played lower
+  artificial: [0, 4, 7], // hollow fifths
+}
 
 // Rhythm menus: [energy 1..5][straight, syncopated], 16 steps per bar.
 const R = (s: string) => s.replace(/\s+/g, ' ').trim()
-// Hold each note until the next one ("x ~ ~ x" becomes "x _ _ x"), so sparse bass and chords
-// ring instead of blipping for one step.
-const hold = (s: string) => R(s).replace(/x( ~)+/g, (m) => m.replace(/~/g, '_'))
+// Hold each note until the next one ("x ~ ~ 4 ~" becomes "x _ _ 4 _"), for still photos.
+const hold = (s: string) => {
+  let on = false
+  return R(s)
+    .split(' ')
+    .map((t) => (t !== '~' ? ((on = true), t) : on ? '_' : t))
+    .join(' ')
+}
 const RHYTHM: Record<'kick' | 'percussion' | 'bass' | 'chords', string[][]> = {
   kick: [
     ['x ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 'x ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ x ~ ~ ~ ~'],
@@ -54,13 +68,45 @@ const RHYTHM: Record<'kick' | 'percussion' | 'bass' | 'chords', string[][]> = {
   ],
 }
 
-// Melody menus: [mood][quiet, lively], scale degrees on 16 steps.
-const MELODY: Record<Mood, [string, string]> = {
-  calm: ['0 ~ ~ ~ 2 ~ ~ ~ 4 ~ ~ ~ 2 ~ ~ ~', '0 ~ 2 ~ 4 ~ 2 ~ 4 ~ 5 ~ 4 ~ 2 ~'],
-  happy: ['4 ~ ~ ~ 5 ~ 4 ~ 2 ~ ~ ~ 0 ~ ~ ~', '0 2 4 ~ 5 4 2 ~ 4 ~ 7 ~ 5 4 2 ~'],
-  tense: ['0 ~ ~ 1 ~ ~ 0 ~ ~ ~ -1 ~ 0 ~ ~ ~', '0 1 0 ~ 3 ~ 1 0 ~ 1 3 ~ 4 3 1 ~'],
-  festive: ['0 ~ 4 ~ ~ ~ 5 ~ 4 ~ ~ ~ 2 ~ ~ ~', '0 4 7 4 5 ~ 4 2 0 4 7 ~ 9 7 4 ~'],
-  melancholy: ['7 ~ ~ ~ 5 ~ ~ ~ 4 ~ ~ ~ 2 ~ 1 ~', '7 ~ 5 4 ~ 2 4 ~ 2 1 ~ 0 ~ ~ ~ ~'],
+// Melody shape from the photo's gesture: scale degrees traced across one bar.
+const CONTOUR: Record<Gist['gesture'], number[]> = {
+  rising: [0, 1, 2, 3, 4, 5, 6, 7],
+  falling: [7, 6, 5, 4, 3, 2, 1, 0],
+  level: [2, 2, 3, 2, 2, 1, 2, 2],
+  round: [0, 2, 4, 6, 7, 6, 4, 2],
+  scattered: [0, 5, 2, 7, 1, 6, 3, 4],
+}
+
+// Open photos leap, close-ups move in small steps.
+const SPREAD: Record<Gist['space'], number> = { open: 1.5, room: 1, close: 0.6 }
+// Open photos echo, close-ups stay dry.
+const ROOM: Record<Gist['space'], number> = { open: 0.55, room: 0.3, close: 0.1 }
+
+// Melody rhythms: [energy 1..5][ordered, balanced, chaotic], 16 steps per bar.
+const MELODY_RHYTHM = [
+  ['x ~ ~ ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~', 'x ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ ~ ~', '~ ~ x ~ ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ ~'],
+  ['x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~', 'x ~ ~ ~ x ~ ~ x ~ ~ ~ ~ x ~ ~ ~', 'x ~ ~ x ~ ~ ~ ~ ~ x ~ x ~ ~ ~ ~'],
+  ['x ~ x ~ x ~ x ~ x ~ x ~ x ~ x ~', 'x ~ x ~ ~ x ~ x x ~ x ~ ~ x ~ ~', 'x ~ ~ x ~ x ~ ~ x x ~ ~ ~ x ~ x'],
+  ['x x ~ x x x ~ x x x ~ x x x ~ x', 'x ~ x x ~ x ~ x x ~ x x ~ x x ~', 'x x ~ x ~ x x ~ ~ x x ~ x ~ x x'],
+  ['x x x x x x x x x x x x x x x x', 'x x ~ x x x ~ x x x ~ x x ~ x x', 'x ~ x x x ~ x x ~ x x x ~ x x x'],
+]
+const ORDER: Gist['order'][] = ['ordered', 'balanced', 'chaotic']
+
+// The melody traces the gesture's whole shape across the bar, however many notes it has.
+function melodySteps(r: Reading, e: number) {
+  const slots = R(MELODY_RHYTHM[e][ORDER.indexOf(r.gist.order)]).split(' ')
+  const count = slots.filter((s) => s === 'x').length
+  const contour = CONTOUR[r.gist.gesture].map((n) => Math.round(n * SPREAD[r.gist.space]))
+  let k = 0
+  const steps = slots.map((s) => (s === 'x' ? contour[count > 1 ? Math.round((k++ * 7) / (count - 1)) : 0] : s))
+  return steps.join(' ')
+}
+
+function chordsFor(r: Reading) {
+  const voicing = new Set(VOICING[r.gist.light])
+  if ((r.pixels.clash ?? 0) > 0.6) voicing.add(1) // clashing colours add a rub
+  const notes = [...voicing].sort((a, b) => a - b)
+  return `<${ROOT_LIST.map((root) => `[${notes.map((n) => n + root).join(',')}]`).join(' ')}>`
 }
 
 // One instrument per role and photo texture. Drum banks also hold crashes and odd hits, so
@@ -118,55 +164,49 @@ export function instrumentFor(r: Reading): Sound {
   return INSTRUMENT[r.role][r.texture]
 }
 
-// Melody rhythms by colour family: reds, greens, blues, purples. `_` holds the note.
-const MELODY_RHYTHM = [
-  'x ~ x ~ x ~ x ~ x ~ x ~ x ~ x ~', // steady
-  'x ~ ~ x ~ ~ x ~ ~ x ~ ~ x ~ x ~', // off-beat
-  'x _ _ _ ~ ~ x _ x _ _ _ ~ ~ ~ ~', // long notes
-  'x x ~ x x ~ x ~ x x ~ x ~ x x ~', // quick runs
-]
-
-// The photo's main colour picks its tune. The colour family picks the rhythm; within a
-// family the notes go forwards, backwards, or start higher. The mood still picks the notes.
-function tuneFor(r: Reading, steps: string) {
-  let notes = R(steps).split(' ').filter((s) => s !== '~')
-  const turn = r.pixels.hue % 3
-  if (turn === 1) notes = notes.reverse()
-  let i = 0
-  const tune = R(MELODY_RHYTHM[Math.floor(r.pixels.hue / 3)])
-    .split(' ')
-    .map((s) => (s === 'x' ? notes[i++ % notes.length] : s))
-  return { steps: tune.join(' '), shift: turn === 2 ? 2 : 0 }
-}
-
 export function partFor(r: Reading, scale: string): string {
   const { name: inst, hits = [0] } = instrumentFor(r)
+  const g = r.gist
   const hit = hits[r.pixels.hue % hits.length]
   const e = r.energy - 1
-  const synco = r.pixels.busyness > 0.45 ? 1 : 0
-  const tune = tuneFor(r, MELODY[r.mood][e >= 2 ? 1 : 0])
+  // Ordered photos play straight, chaotic ones syncopated.
+  const synco = g.order === 'ordered' ? 0 : g.order === 'chaotic' ? 1 : r.pixels.busyness > 0.45 ? 1 : 0
   const b = r.pixels.brightness
   const lpf = Math.round(500 + b * 5000)
-  const shift = b > 0.7 ? 1 : b < 0.25 ? -1 : 0
+  // Bright, light photos play higher; dark, heavy, night photos lower.
+  const lift = (b > 0.7 ? 1 : b < 0.25 ? -1 : 0) + (g.weight === 'light' ? 1 : g.weight === 'heavy' ? -1 : 0) + (g.light === 'night' ? -1 : 0)
+  const shift = Math.max(-1, Math.min(1, lift))
   const at = (role: Role) => `${KEY}${OCTAVE[role] + shift}:${scale}`
+  const still = g.motion === 'still'
+  const notes = (s: string) => (still ? hold(s) : R(s))
+  const room = ROOM[g.space]
+  // Rough surfaces sound gritty; soft-edged photos swell in.
+  const grit = g.surface === 'rough' ? '.crush(8)' : ''
+  const swell = (r.pixels.sharpness ?? 0.5) < 0.3 ? '.attack(0.06)' : ''
+  // Many subjects play in harmony; a few, every other bar.
+  const voices = g.focus === 'many' ? '.add("[0,2]")' : g.focus === 'few' ? '.add("<0 [0,2]>")' : ''
 
   switch (r.role) {
     case 'kick':
-      return `s("${inst}").n(${hit}).struct("${R(RHYTHM.kick[e][synco])}").gain(1)`
+      return `s("${inst}").n(${hit}).struct("${R(RHYTHM.kick[e][synco])}")${grit}.gain(1)`
     case 'percussion':
       // Loud on the beat, softer between, so fast patterns don't sound like a machine gun.
-      return `s("${inst}").n(${hit}).struct("${R(RHYTHM.percussion[e][synco])}").velocity("[1 .6 .8 .6]*4").gain(0.7)`
+      return `s("${inst}").n(${hit}).struct("${R(RHYTHM.percussion[e][synco])}").velocity("[1 .6 .8 .6]*4")${grit}.room(${room / 2}).gain(0.7)`
     case 'bass':
-      return `n("${ROOTS}").struct("${hold(RHYTHM.bass[e][synco])}").scale("${at('bass')}").s("${inst}").lpf(${Math.min(lpf, 1800)}).gain(0.9)`
-    // Drums and bass stay dry; the rest shares one reverb.
+      return `n("${ROOTS}").struct("${notes(RHYTHM.bass[e][synco])}").scale("${at('bass')}").s("${inst}").lpf(${Math.min(lpf, 1800)})${grit}.gain(0.9)`
     case 'chords':
-      return `n("${TRIADS}").struct("${hold(RHYTHM.chords[e][synco])}").scale("${at('chords')}").s("${inst}").lpf(${lpf}).decay(0.3).sustain(0.4).room(0.3).gain(0.55)`
-    case 'melody':
-      return `n("${tune.steps}".add(${tune.shift})).scale("${at('melody')}").s("${inst}").lpf(${lpf}).room(0.3).gain(0.75)`
+      return `n("${chordsFor(r)}").struct("${notes(RHYTHM.chords[e][synco])}").scale("${at('chords')}").s("${inst}").lpf(${lpf}).decay(0.3).sustain(0.4)${swell}${grit}.room(${room}).gain(0.5)`
+    case 'melody': {
+      // .add sits on the pattern, after n() closes. A harmony inside the quotes is not valid Strudel.
+      const clip = still ? '' : '.clip(0.6)'
+      return `n("${notes(melodySteps(r, e))}")${voices}${clip}.scale("${at('melody')}").s("${inst}").lpf(${lpf})${swell}${grit}.room(${room}).gain(${g.focus === 'one' ? 0.75 : 0.6})`
+    }
     case 'texture':
-      return `n("${TRIADS}").struct("${e >= 3 ? 'x ~ x ~' : 'x'}").scale("${at('texture')}").s("${inst}").attack(0.6).release(2).lpf(${lpf}).room(0.3).gain(0.45)`
+      return `n("${chordsFor(r)}").struct("${e >= 3 || !still ? 'x ~ x ~' : 'x'}").scale("${at('texture')}").s("${inst}").attack(0.6).release(2).lpf(${lpf})${grit}.room(${Math.max(room, 0.3)}).gain(0.4)`
   }
 }
+
+const COLOUR_VOTE = 0.6
 
 export function mixFor(cards: PlayingCard[]) {
   if (cards.length === 0) return { code: '', bpm: 0, scale: '' }
@@ -175,7 +215,11 @@ export function mixFor(cards: PlayingCard[]) {
   const bpm = Math.round(80 + ((avg - 1) / 4) * 48)
 
   const votes: Partial<Record<Mood, number>> = {}
-  for (const c of cards) votes[c.reading.mood] = (votes[c.reading.mood] ?? 0) + (c.reading.moodProb || 0.5)
+  // The model's mood and the colours' mood both vote, like a Rothko: colour alone moves the feeling.
+  for (const c of cards) {
+    votes[c.reading.mood] = (votes[c.reading.mood] ?? 0) + (c.reading.moodProb || 0.5)
+    votes[c.reading.colourMood] = (votes[c.reading.colourMood] ?? 0) + COLOUR_VOTE
+  }
   const mood = (Object.entries(votes).sort((a, b) => b[1] - a[1])[0][0] ?? 'calm') as Mood
   const scale = SCALE[mood]
 
