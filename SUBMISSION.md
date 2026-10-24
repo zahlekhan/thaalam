@@ -25,7 +25,7 @@ Participate solo or in a team of up to 4. Remove unused rows.
 - **Install command:** `npm --prefix web ci` and `pip install -r server/requirements.txt` (in a venv at `server/.venv-lite`).
 - **Required environment variable names:** `TYPESAFE_API_KEY`. Optional: `THAALAM_PROVIDER`, `JEV_MODEL`, `ALLOWED_ORIGINS`, `VITE_API_URL`.
 - **Start command:** `./server/dev.sh` and `npm --prefix web run dev` (local), or `npm run deploy` (Cloudflare Workers).
-- **Demo walkthrough:** Tap to start sound, then add a sample photo from the tray and hear its part. Add more samples or drop your own photos onto the stage and the loop grows. Drag a card off the stage to mute it. Open "Code" to see the generated Strudel pattern.
+- **Demo walkthrough:** Tap to start sound, then add a sample photo from the tray and hear its part. Add more samples or drop your own photos onto the stage and the loop grows. Drag a card off the stage to mute it. Open "Options" at the bottom right and tick "Show code" to see the generated Strudel pattern.
 - **Checks performed and results:** `npm --prefix web run build` passes. No automated tests.
 - **Known limitations or incomplete features:** Rooms (multiplayer) not built; vegaml is local-only; fixed key; equal volume for all cards. See [README.md](README.md#current-status).
 - **Libraries, APIs, and public datasets used:** See [README.md](README.md#current-status) and [web/public/samples/CREDITS.md](web/public/samples/CREDITS.md).

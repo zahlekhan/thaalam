@@ -177,13 +177,6 @@ body,
   height: 100%;
   object-fit: cover;
 }
-.topbar select.model {
-  border: 0;
-  border-radius: 10px;
-  padding: 8px 10px;
-  font-size: 14px;
-  background: #fff3c4;
-}
 .tray .credit {
   font-size: 11px;
   color: #777;
@@ -246,4 +239,50 @@ body,
 .camera-actions button:disabled {
   opacity: 0.5;
   cursor: default;
+}
+.options {
+  position: absolute;
+  bottom: 24px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.options-toggle {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+.options-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.97);
+  padding: 12px 14px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  font-size: 14px;
+}
+.options-menu label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.options-menu select {
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 14px;
+  background: #fff3c4;
+}
+@media (max-width: 900px) {
+  .options {
+    bottom: 104px;
+  }
 }
