@@ -217,7 +217,7 @@ components:
 
 The canvas is the shared fridge door everyone sticks things to. A glossy mint enamel ground carries white-bordered photo prints hung at small random angles, each held by a chunky plastic magnet in its role's colour. Everything else (the control bar, the status chip, the sheets) is white plastic or paper resting on the same door, so the interface reads as household objects rather than software chrome.
 
-Density is low and tactile. Cards are one fixed size and land wherever people drop them; there is no grid, stage or lane to tidy them into. State lives on the object itself: a muted card's magnet goes grey and its photo desaturates, a card still being read shows a striped placeholder with a grey magnet, and a tempo or mood change turns the status chip yellow until someone notices. Motion comes from the music: each magnet bounces on its own card's notes, and it stays still under reduced motion.
+Density is low and tactile. Cards are one fixed size and land wherever people drop them; there is no grid, stage or lane to tidy them into. State lives on the object itself: a muted card's magnet goes grey and its photo desaturates, a card still being read shows a striped placeholder with a grey magnet, and a tempo or mood change turns the status chip yellow until someone notices. Motion is physical: each print hangs from its magnet, swings when anyone drags it and settles when dropped; on each of its card's notes the magnet squashes and stretches and the paper lifts a little off the door. All of it stays still under reduced motion.
 
 The world refuses the whiteboard with a dashed stage and the dark DAW mixer. Dark ink appears only as small transient overlays (the selected-card pill, the toast, the code view) and as the solid commit button inside a sheet. The ground itself is never dark.
 
@@ -355,7 +355,7 @@ Chunky, plastic, thumb-sized.
 - **Toast:** Ink bar, 16px radius, Body text; action in Sticker Yellow bold; Brick for errors.
 
 ### Magnet (signature)
-A 36px glossy dome centred on the top edge of a print, overlapping it by 14px, filled with its role colour. On each note the card plays it bounces (translateY -5px, scale 1.14, 240ms, cubic-bezier(0.16, 1, 0.3, 1)) timed to the audio clock. It turns Idle Grey when muted or still being read. The magnet is the legend: there is no separate role key.
+A 36px glossy dome centred on the top edge of a print, overlapping it by 14px, filled with its role colour. On each note the card plays it squashes and stretches (scale 1.24 x 0.86, then 0.92 x 1.1, 280ms, cubic-bezier(0.16, 1, 0.3, 1)) timed to the audio clock, and knocks the print about 3 degrees off the door (rotateX in perspective). A small white glint at the top left rounds the dome. Prints pivot on the magnet's centre: dragging swings the print behind the pointer (up to 22 degrees) on an underdamped spring and lifts it to scale 1.04 with the Peel shadow; a new card is pressed onto the door from 16px above at scale 1.12 (420ms) and its magnet snaps on. Springs live in `web/src/swing.ts`. It turns Idle Grey when muted or still being read. The magnet is the legend: there is no separate role key.
 
 ### Icons
 Authored inline SVG strokes on a 24px grid, stroke 2.2, round caps and joins, `currentColor`, 22px by default and 16px inside magnets.

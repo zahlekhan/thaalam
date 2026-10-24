@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T01:15:00+05:30 — Prints hang and swing from their magnets
+
+- Changed: New `web/src/swing.ts` gives every card two small springs, driven by one animation loop that stops when all prints rest. Prints pivot on their magnet: dragging (yours or anyone's in the room) swings the print behind the pointer and lifts it off the door; on release it swings back and settles. On each note the magnet squashes and stretches and the paper lifts about 3 degrees in perspective. New cards are pressed onto the door and their magnet snaps on; a magnet also snaps when its reading arrives. Magnets got a glint. `sound.ts` now calls `pluck()` instead of the old bounce. Files: `web/src/swing.ts`, `CardShape.tsx`, `sound.ts`, `styles.css`, `README.md`, `DESIGN.md`.
+- Why: The canvas felt flat; physical depth fits the fridge-door world without replacing React Flow or rooms.
+- Validation: `tsc -b` passes; headless Chrome (1280x800): drag swings up to ~10 degrees and settles to rest in ~1.5s, notes lift the print with sound on, nothing moves under emulated reduced motion; screenshots checked.
+- Limitations: Not tested on a real phone. Tuning is by eye. Deleted cards still vanish without an animation.
+
 ## 2026-10-25T01:22:00+05:30 — More instruments and a fuller sound
 
 - Changed: Each role now has one instrument per photo texture (30 in all, up from 12 picked by a warm/cool split), so the model's 5-way texture answer is used. The original 12 sounds keep a slot. New: kit, punchy and retro kicks; wood block, drum machine and brushes; fretless, picked and soft synth bass; nylon guitar, steel drums and reed organ chords; sitar, synth beeps and flute melodies; bowed, metal and synth pads. Drum banks now list the sample numbers to use, because `n(0..4)` on `hh` could pick a crash cymbal or a kick. Metallic percussion now uses `linnhats` instead of `hh`, which measured 15 dB quieter than the other percussion. Bass and chord notes ring until the next note instead of lasting one 16th step. Chords, melody and pads get light reverb (`room(0.3)`). Percussion is accented on the beat.

@@ -1,9 +1,10 @@
-import { memo } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import type { Node, NodeProps } from '@xyflow/react'
 import { combine, type ModelReading, type Pixels, type Role } from './reading'
 import { instrumentFor } from './music'
 import { pendingPhotos, photos, type CardData } from './room'
 import { MuteIcon } from './icons'
+import { hang, land, moved, pump, unhang } from './swing'
 
 export const CARD_W = 160
 export const CARD_H = 200
@@ -40,8 +41,25 @@ export function describe(card: CardData) {
   return { title, line, label }
 }
 
-export const Card = memo(function Card({ data }: NodeProps<CardNode>) {
+export const Card = memo(function Card({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<CardNode>) {
   const reading = data.status === 'ready' ? readingOf(data) : null
+  const print = useRef<HTMLDivElement>(null)
+  const voiced = reading !== null
+  const wasVoiced = useRef(voiced)
+
+  useEffect(() => {
+    hang(data.id, print.current!)
+    // A card that shows up while it's still being read was just added: press it onto the door.
+    if (data.status !== 'ready') land(data.id)
+    return () => unhang(data.id)
+  }, [data.id])
+  useEffect(() => moved(data.id, positionAbsoluteX, positionAbsoluteY), [data.id, positionAbsoluteX, positionAbsoluteY])
+  // Its reading arrived and the magnet takes its role colour: snap it on.
+  useEffect(() => {
+    if (voiced && !wasVoiced.current) pump(data.id)
+    wasVoiced.current = voiced
+  }, [voiced, data.id])
+
   // Blank until the model clears the photo; the uploader gets a local preview.
   const src = photos.get(data.id) ?? pendingPhotos.get(data.id)
   const { title, line } = describe(data)
@@ -49,11 +67,12 @@ export const Card = memo(function Card({ data }: NodeProps<CardNode>) {
 
   return (
     <div
+      ref={print}
       className={`card${data.muted ? ' muted' : ''}${reading ? '' : ' listening'}`}
       data-card={data.id}
       style={{ width: CARD_W, height: CARD_H, rotate: `${data.rot ?? 0}deg`, ['--role' as string]: color }}
     >
-      <span className="magnet" data-magnet={data.id}>
+      <span className="magnet">
         {data.muted ? <MuteIcon size={16} /> : null}
       </span>
       <div className="photo">{src ? <img src={src} draggable={false} alt="" /> : null}</div>

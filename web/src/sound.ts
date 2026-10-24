@@ -1,7 +1,8 @@
-// Strudel setup plus the "bounce the card's magnet on its own notes" hook.
+// Strudel setup plus the hook that plucks each card on its own notes.
 
 import { initStrudel, samples, evaluate, hush } from '@strudel/web'
 import { registerSoundfonts } from '@strudel/soundfonts'
+import { pluck } from './swing'
 
 let ready: Promise<unknown> | null = null
 
@@ -12,21 +13,9 @@ export function startSound() {
   return ready
 }
 
-const still = matchMedia('(prefers-reduced-motion: reduce)')
-
-// Strudel calls this a little before each note. Wait until the note actually sounds, then bounce.
+// Strudel calls this a little before each note. Wait until the note actually sounds, then pluck the card.
 ;(window as any).hit = (id: string) => (_hap: unknown, now: number, _cps: number, target: number) => {
-  if (still.matches) return
-  setTimeout(() => {
-    const el = document.querySelector(`[data-magnet="${id}"]`) as HTMLElement | null
-    el?.animate(
-      [
-        { transform: 'translateY(-5px) scale(1.14)' },
-        { transform: 'translateY(0) scale(1)' },
-      ],
-      { duration: 240, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
-    )
-  }, Math.max(0, (target - now) * 1000))
+  setTimeout(() => pluck(id), Math.max(0, (target - now) * 1000))
 }
 
 let last = ''
