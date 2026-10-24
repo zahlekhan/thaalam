@@ -235,10 +235,10 @@ The world refuses the whiteboard with a dashed stage and the dark DAW mixer. Dar
 A cool mint household ground, white paper and plastic, near-black ink, and six primary-plastic magnet colours that each mean one musical role.
 
 ### Primary
-- **Go Red** (go): the one "do it" colour. Round Play button, Join the jam, Publish. A deeper cut of Kick Red so white text clears AA. Hover darkens to **Go Red Pressed** (go-hover).
+- **Go Red** (go): the one "do it" colour. Round Play button, Join the jam, Publish, and Add photo on an empty fridge. A deeper cut of Kick Red so white text clears AA. Hover darkens to **Go Red Pressed** (go-hover).
 
 ### Secondary
-- **Invite Blue** (invite): Invite and Copy link only, the social action. Same value as Bass Blue; hover darkens to **Invite Blue Pressed** (invite-hover).
+- **Invite Blue** (invite): Copy link, and the Invite button only while inviting is the next step (photos on the fridge, no room yet). Same value as Bass Blue; hover darkens to **Invite Blue Pressed** (invite-hover).
 
 ### Tertiary (the magnet set)
 Role colours exist to tell parts apart across the room. They fill magnets, the wordmark letters and gallery mini-magnets, and nothing else.
@@ -328,8 +328,8 @@ Paper is nearly square-cornered (prints 4px, sample tiles 6px, gallery mini prin
 Chunky, plastic, thumb-sized.
 - **Shape:** 16px radius for bar and commit buttons, 12px for small and text buttons, circular for Play.
 - **Go (primary):** Go Red with white Action text, 52px tall, 20px side padding, plastic lip. Hover deepens to Go Red Pressed.
-- **Play:** 56px Go Red circle with plastic lip; Ink while playing (shows Stop); Idle Grey with ink icon while sounds load.
-- **Invite / Copy:** Invite Blue with white text; hover to Invite Blue Pressed.
+- **Play:** 56px Go Red circle with plastic lip; Ink while playing (shows Stop); Idle Grey with ink icon while sounds load; Mint Wash with an ink icon and no lip while stopped on an empty fridge, so Add photo is the only red.
+- **Invite / Copy:** Invite Blue with white text; hover to Invite Blue Pressed. The Invite bar button wears it only as the next step; otherwise it is a neutral bar button.
 - **Bar (neutral):** Mint Wash fill, Control text, 52px; icon-only variant is 52px square.
 - **Big (sheet commit):** full-width Ink, 56px, white Action text.
 - **Text:** no fill, underlined with 3px offset, 44px min height; hover adds a 6% ink wash.
@@ -350,7 +350,8 @@ Chunky, plastic, thumb-sized.
 - **Link field:** Mint Wash, 2px Hairline border, 12px radius, 48px, 14px text, paired with Copy.
 
 ### Navigation
-- **Control bar:** white 24px-radius bar with Lift holding Play, Add photo, Invite and a More button. The More menu is a white 16px panel of 48px rows that take a Mint Wash hover.
+- **Control bar:** white 24px-radius bar with Lift holding Play, Add photo, Invite, Share and a More button. It grows with the canvas and fills only the next step: an empty fridge shows Play, a wide Go Red "Add photo" and More; the first photo brings in Invite in Invite Blue (Add photo turns neutral); once the canvas has a room (someone invited, or joined by link) Invite turns neutral with its head count and Share joins, neutral, since publishing is never pushed. A button joining the bar pops on (opacity and scale 0.82 to 1, 320ms, cubic-bezier(0.16, 1, 0.3, 1)); none under reduced motion. Steps not yet in the bar sit at the top of the More menu.
+- **More menu:** a white 16px panel of 48px rows that take a Mint Wash hover.
 - **Selected-card pill:** Ink bar, 20px radius, above the control bar; 44px thumbnail, Label name, Caption meta, then Mute and Delete as ghost buttons with a 14% white hover.
 - **Toast:** Ink bar, 16px radius, Body text; action in Sticker Yellow bold; Brick for errors.
 

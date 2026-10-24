@@ -441,11 +441,20 @@ function BottomBar({
   const here = peers.names.length + 1
   const close = () => setSheet(null)
 
+  // The bar grows with the canvas, one next step at a time: add a photo, then invite someone to
+  // hear it, then share it publicly. A canvas with a room was already shared with someone (you
+  // invited, or you came in through a link). Hidden steps stay in the More menu.
+  const { total } = useMix()
+  const hasPhotos = total > 0
+  const inRoom = !!peers.room
+  const showInvite = hasPhotos || inRoom
+  const showShare = hasPhotos && inRoom
+
   return (
     <>
       <nav className="bottombar" aria-label="Controls">
         <button
-          className={`play ${soundState}`}
+          className={`play ${soundState}${hasPhotos ? '' : ' idle'}`}
           onClick={onToggleSound}
           disabled={soundState === 'loading'}
           aria-label={soundState === 'on' ? 'Stop' : soundState === 'loading' ? 'Loading sounds' : 'Play'}
@@ -462,28 +471,38 @@ function BottomBar({
         ) : soundState === 'loading' ? (
           <span className="loading-note">Loading sounds…</span>
         ) : (
-          <button className="bar-btn" onClick={() => setSheet('add')}>
+          <button className={`bar-btn${hasPhotos ? '' : ' go'}`} onClick={() => setSheet('add')}>
             <PlusIcon size={20} />
-            Add<span className="wide-only">photo</span>
+            {hasPhotos ? (
+              <>
+                Add<span className="wide-only">photo</span>
+              </>
+            ) : (
+              'Add photo'
+            )}
           </button>
         )}
         {!VIEW_ONLY && (
           <>
-            <button className="bar-btn invite" onClick={() => setSheet('invite')}>
-              <PeopleIcon size={20} />
-              {here > 1 ? (
-                <>
-                  Invite <span className="wide-only">· {here} here</span>
-                  <span className="narrow-only">· {here}</span>
-                </>
-              ) : (
-                'Invite'
-              )}
-            </button>
-            <button className="bar-btn share" onClick={() => setSheet('share')} aria-label="Share in the public gallery">
-              <GalleryIcon size={20} />
-              Share
-            </button>
+            {showInvite && (
+              <button className={`bar-btn invite arrive${inRoom ? '' : ' next'}`} onClick={() => setSheet('invite')}>
+                <PeopleIcon size={20} />
+                {here > 1 ? (
+                  <>
+                    Invite <span className="wide-only">· {here} here</span>
+                    <span className="narrow-only">· {here}</span>
+                  </>
+                ) : (
+                  'Invite'
+                )}
+              </button>
+            )}
+            {showShare && (
+              <button className="bar-btn share arrive" onClick={() => setSheet('share')} aria-label="Share in the public gallery">
+                <GalleryIcon size={20} />
+                Share
+              </button>
+            )}
             <button className="bar-btn icon" onClick={() => setSheet(sheet === 'more' ? null : 'more')} aria-label="More" aria-expanded={sheet === 'more'}>
               <MoreIcon size={22} />
             </button>
@@ -500,7 +519,13 @@ function BottomBar({
           <CodeIcon size={18} />
         </button>
       )}
-      {sheet === 'more' && <MoreMenu onClose={close} />}
+      {sheet === 'more' && (
+        <MoreMenu
+          onClose={close}
+          onInvite={showInvite ? undefined : () => setSheet('invite')}
+          onShare={showShare || !hasPhotos ? undefined : () => setSheet('share')}
+        />
+      )}
       {sheet === 'add' && <AddSheet onClose={close} onFiles={onFiles} onSample={onSample} />}
       {sheet === 'invite' && <InviteSheet onClose={close} peers={peers} />}
       {sheet === 'share' && <ShareSheet onClose={close} peers={peers} />}
@@ -753,7 +778,8 @@ function ShareSheet({ onClose, peers }: { onClose: () => void; peers: ReturnType
   )
 }
 
-function MoreMenu({ onClose }: { onClose: () => void }) {
+// Invite and Share live here until the bar has room for them (see BottomBar).
+function MoreMenu({ onClose, onInvite, onShare }: { onClose: () => void; onInvite?: () => void; onShare?: () => void }) {
   const [models, setModels] = useState<string[]>([])
   const [model, setModel] = useState(currentModel)
   useEffect(() => {
@@ -775,6 +801,18 @@ function MoreMenu({ onClose }: { onClose: () => void }) {
     <>
       <div className="menu-backdrop" onClick={onClose} />
       <div className="menu" role="menu">
+        {onInvite && (
+          <button role="menuitem" onClick={onInvite}>
+            <PeopleIcon size={20} />
+            Invite friends
+          </button>
+        )}
+        {onShare && (
+          <button role="menuitem" onClick={onShare}>
+            <GalleryIcon size={20} />
+            Share in the public gallery
+          </button>
+        )}
         <a role="menuitem" href="/gallery">
           <GalleryIcon size={20} />
           Public gallery

@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T01:45:00+05:30 — The control bar grows one next step at a time
+
+- Changed: The bottom bar now follows the canvas instead of showing every action at once. Empty fridge: Play, a wide Go Red "Add photo" and More; Play turns Mint Wash while stopped so Add photo is the only red. First photo: Invite appears in Invite Blue as the next step and Add photo turns neutral. Once the canvas has a room (you opened Invite, or came in through a link): Invite turns neutral with its "· N here" count and Share appears, also neutral. Steps not yet in the bar sit at the top of the More menu ("Invite friends", "Share in the public gallery"), so nothing is unreachable. New buttons pop into the bar (none under reduced motion). The stage is worked out from the photo count and whether a room exists, so there is nothing new to store. Files: `web/src/App.tsx` (`BottomBar`, `MoreMenu`), `web/src/styles.css`, `DESIGN.md`, `README.md`.
+- Why: Invite had the only filled button in the bar, so on an empty fridge it outranked Add photo, the one action that does anything. Inviting is worth more once there is a loop to hear, and public sharing should come last and never be pushed.
+- Validation: `tsc -b` passes. In the in-app browser (Vite dev server, no worker) at 800x600 and 375x812, checked all three stages, the More menu at each stage, and that opening Invite creates the room and moves the bar to stage 3; fixed a phone mismatch where neutral Invite kept its icon while Share hid its own.
+- Limitations: The "· N here" count with a second person wasn't checked, because no worker was running; that code didn't change. Someone who joins an empty room by link sees Invite (neutral) next to the red Add photo, by design. Not tested on a real phone.
+
 ## 2026-10-25T01:30:00+05:30 — Prints swing on their magnets
 
 - Changed: New `web/src/swing.ts`: each card gets two spring animations driven by one rAF loop — a swing around the magnet while dragged (own drags and remote ones), a lift off the door (`rotateX`) on each of its notes, a press-on when added, and a snap when its reading lands. `CardShape.tsx` registers prints with the loop; `sound.ts` replaces the old magnet bounce with `pluck()`. CSS: cards pivot at the magnet (`transform-origin`), scale up while dragging, magnets get a light glint.
