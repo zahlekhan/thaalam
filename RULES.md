@@ -32,10 +32,6 @@ All times below are in **Indian Standard Time (IST, UTC+05:30)**:
 - Bring your **laptop and charger**.
 - Be **respectful of fellow participants**.
 
-## Credits
-
-**Eligible checked-in participants will receive Codex credits and OpenAI API credits.**
-
 ## Source and repository guidance
 
 These rules reflect the organizer-provided event announcement. The [Luma page](https://luma.com/z10nz8gp) is the event and registration reference. Follow any event updates communicated by the organizers.
