@@ -1,14 +1,14 @@
-import { BaseBoxShapeUtil, HTMLContainer, T, type RecordProps, type TLShape } from 'tldraw'
+import { memo } from 'react'
+import type { Node, NodeProps } from '@xyflow/react'
 import { combine, type ModelReading, type Pixels, type Role } from './reading'
 import { instrumentFor } from './music'
+import { photos, type CardData } from './room'
 
-declare module 'tldraw' {
-  interface TLGlobalShapePropsMap {
-    card: { w: number; h: number; src: string; status: string; model: string; pixels: string }
-  }
-}
+export const CARD_W = 180
+export const CARD_H = 236
 
-export type CardShape = TLShape<'card'>
+export type CardNode = Node<CardData & { onStage: boolean }, 'card'>
+export type StageNode = Node<Record<string, never>, 'stage'>
 
 export const ROLE_ICON: Record<Role, string> = {
   kick: '🥁',
@@ -19,65 +19,42 @@ export const ROLE_ICON: Record<Role, string> = {
   texture: '🌫️',
 }
 
-export function readingOf(card: CardShape) {
-  if (!card.props.pixels) return null
-  const pixels = JSON.parse(card.props.pixels) as Pixels
-  const model = card.props.model ? (JSON.parse(card.props.model) as ModelReading) : null
+export function readingOf(card: Pick<CardData, 'pixels' | 'model'>) {
+  if (!card.pixels) return null
+  const pixels = JSON.parse(card.pixels) as Pixels
+  const model = card.model ? (JSON.parse(card.model) as ModelReading) : null
   return combine(model, pixels)
 }
 
-export class CardUtil extends BaseBoxShapeUtil<CardShape> {
-  static override type = 'card' as const
-  static override props: RecordProps<CardShape> = {
-    w: T.number,
-    h: T.number,
-    src: T.string,
-    status: T.string,
-    model: T.string,
-    pixels: T.string,
-  }
+export const Card = memo(function Card({ data }: NodeProps<CardNode>) {
+  const reading = data.status === 'ready' ? readingOf(data) : null
+  const glow = reading?.pixels.palette[0] ?? '#888'
+  const inst = reading ? instrumentFor(reading) : null
 
-  getDefaultProps(): CardShape['props'] {
-    return { w: 180, h: 236, src: '', status: 'reading', model: '', pixels: '' }
-  }
+  let line = 'Listening...'
+  if (data.status === 'error') line = "Can't reach the model"
+  else if (reading?.guessed) line = `${reading.mood}, a guess`
+  else if (reading) line = `${reading.mood} ${Math.round(reading.moodProb * 100)}%`
 
-  override canResize() {
-    return false
-  }
+  return (
+    <div
+      className={`card ${data.onStage ? 'on-stage' : 'parked'}`}
+      data-card={data.id}
+      style={{ width: CARD_W, height: CARD_H, ['--glow' as string]: glow }}
+    >
+      <img src={photos.get(data.id)} draggable={false} alt="" />
+      <div className="card-info">
+        <div className="card-inst">{reading ? `${ROLE_ICON[reading.role]} ${inst?.label}` : ' '}</div>
+        <div className="card-line">{line}</div>
+      </div>
+    </div>
+  )
+})
 
-  component(card: CardShape) {
-    const onStage = this.editor.getShape(card.parentId)?.type === 'frame'
-    const reading = card.props.status === 'ready' ? readingOf(card) : null
-    const glow = reading?.pixels.palette[0] ?? '#888'
-    const inst = reading ? instrumentFor(reading) : null
-
-    let line = 'Listening...'
-    if (card.props.status === 'error') line = "Can't reach the model"
-    else if (reading?.guessed) line = `${reading.mood}, a guess`
-    else if (reading) line = `${reading.mood} ${Math.round(reading.moodProb * 100)}%`
-
-    return (
-      <HTMLContainer>
-        <div
-          className={`card ${onStage ? 'on-stage' : 'parked'}`}
-          data-card={card.id}
-          style={{ ['--glow' as string]: glow }}
-        >
-          <img src={card.props.src} draggable={false} alt="" />
-          <div className="card-info">
-            <div className="card-inst">
-              {reading ? `${ROLE_ICON[reading.role]} ${inst?.label}` : ' '}
-            </div>
-            <div className="card-line">{line}</div>
-          </div>
-        </div>
-      </HTMLContainer>
-    )
-  }
-
-  getIndicatorPath(card: CardShape) {
-    const p = new Path2D()
-    p.roundRect(0, 0, card.props.w, card.props.h, 16)
-    return p
-  }
+export function Stage({ width, height }: NodeProps<StageNode>) {
+  return (
+    <div className="stage" style={{ width, height }}>
+      <span>Stage</span>
+    </div>
+  )
 }

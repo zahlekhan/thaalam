@@ -12,9 +12,26 @@ body,
   inset: 0;
 }
 
+.app {
+  background: #f4f3ef;
+}
+.stage {
+  border-radius: 20px;
+  background: #fff;
+  border: 2px dashed #d8d4ca;
+  box-sizing: border-box;
+}
+.stage span {
+  position: absolute;
+  top: -26px;
+  left: 4px;
+  font-size: 14px;
+  color: #777;
+}
+.react-flow__node-stage {
+  pointer-events: none !important;
+}
 .card {
-  width: 100%;
-  height: 100%;
   border-radius: 16px;
   overflow: hidden;
   background: #111;
@@ -56,14 +73,14 @@ body,
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 300;
+  z-index: 10;
 }
 .overlay > * {
   pointer-events: auto;
 }
 .topbar {
   position: absolute;
-  top: 56px;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -80,7 +97,7 @@ body,
 }
 @media (max-width: 600px) {
   .topbar {
-    top: 52px;
+    top: 8px;
   }
   .status {
     order: 5;
@@ -126,7 +143,7 @@ body,
 }
 .tray {
   position: absolute;
-  bottom: 112px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;

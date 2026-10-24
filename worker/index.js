@@ -2,6 +2,13 @@
 // frontend works unchanged. Ports server/app.py (FastAPI) — Jev is the only
 // model here; vegaml stays local-only.
 
+import { routePartykitRequest } from "partyserver";
+import { YServer } from "y-partyserver";
+
+// One shared canvas per room (/parties/room/<id>). Kept in memory only:
+// photos are not stored after everyone leaves.
+export class Room extends YServer {}
+
 const JEV_URL = "https://api.typesafe.ai/v1/systemone";
 
 // One question set. Choice questions only, same as server/app.py — but with
@@ -135,6 +142,9 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === "/api/health") return health(env);
     if (url.pathname === "/api/analyze") return analyze(request, env, url);
+    if (url.pathname.startsWith("/parties/")) {
+      return (await routePartykitRequest(request, env)) ?? new Response("Not found", { status: 404 });
+    }
     return env.ASSETS.fetch(request);
   },
 };
