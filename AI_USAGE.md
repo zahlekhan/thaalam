@@ -8,7 +8,7 @@ Rows marked TODO were backfilled from git history and need the team to fill in t
 
 | Date and time with timezone | Tool / model, if known | Task | Assistance and affected files | Human review / corrections | Validation and result |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-24T21:44:19+05:30 | Devin | Add hackathon documentation | Added the template docs and filled them in from the code and git history: `README.md`, `RULES.md`, `AGENTS.md`, `CHANGELOG.md`, `AI_USAGE.md`, `SUBMISSION.md`, `.github/pull_request_template.md` | Pending | Web build, Python and JS syntax checks passed; see `CHANGELOG.md` |
+| 2026-10-24T21:44:19+05:30 | Devin | Add hackathon documentation | Added the template docs and filled them in from the code and git history: `README.md`, `AGENTS.md`, `CHANGELOG.md`, `AI_USAGE.md`, `SUBMISSION.md`, `.github/pull_request_template.md` | Pending | Web build, Python and JS syntax checks passed; see `CHANGELOG.md` |
 | 2026-10-24T21:20:31+05:30 | Claude Opus 5.5 (commit co-author) | Ignore Wrangler state | `.gitignore` (commit `8afacba`) | TODO | TODO |
 | 2026-10-24T21:20:24+05:30 | Devin (commit trailer) | Cloudflare Workers deploy | `worker/index.js`, `wrangler.jsonc`, `package.json` (commit `d166fa1`) | TODO | TODO |
 | 2026-10-24T21:09:16+05:30 | TODO | Configurable API base, CORS, Dockerfile, fly.toml | `web/src/reading.ts`, `server/app.py`, `server/Dockerfile`, `server/fly.toml` (commit `b390741`) | TODO | TODO |

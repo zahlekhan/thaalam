@@ -2,7 +2,7 @@
 
 Drop photos on a canvas, hear them become one original music loop.
 
-Built at the hackathon from scratch. **[Event rules](RULES.md)** · **[Agent instructions](AGENTS.md)** · **[Design notes](CONTEXT.md)**
+Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[Design notes](CONTEXT.md)**
 
 ## Project overview
 

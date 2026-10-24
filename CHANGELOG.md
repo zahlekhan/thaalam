@@ -6,7 +6,7 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## 2026-10-24T21:44:19+05:30 — Add hackathon documentation
 
-- Changed: Added `README.md`, `RULES.md`, `AGENTS.md`, `CHANGELOG.md`, `AI_USAGE.md`, `SUBMISSION.md` and `.github/pull_request_template.md` from the hackathon template, filled in from the existing code and `CONTEXT.md`. Entries below are backfilled from git history.
+- Changed: Added `README.md`, `AGENTS.md`, `CHANGELOG.md`, `AI_USAGE.md`, `SUBMISSION.md` and `.github/pull_request_template.md` from the hackathon template, filled in from the existing code and `CONTEXT.md`. Entries below are backfilled from git history.
 - Why: Follow the hackathon template's documentation and submission guidelines.
 - Validation: `npm --prefix web ci && npm --prefix web run build` passed on Node 22.12.0 (with Rolldown ambiguous-export warnings from Strudel's `superdough`). `python3 -m py_compile server/app.py` and `node --check worker/index.js` passed. Local Markdown links checked.
 - Limitations: The team, demo URL and submission details are still TODO. Backfilled entries have no recorded validation.

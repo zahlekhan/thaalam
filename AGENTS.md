@@ -2,7 +2,7 @@
 
 ## Event requirements
 
-- Read [RULES.md](RULES.md) before working. Build project implementation from scratch at the event; do not import a pre-built project.
+- Build project implementation from scratch at the event; do not import a pre-built project.
 - Libraries, APIs, and public datasets are allowed. Document their sources and use.
 - Use AI coding tools (Codex, Devin, Claude, or others) during development and briefly record their actual contribution in [AI_USAGE.md](AI_USAGE.md).
 - Prepare a code repository, short project description, and working demo in [SUBMISSION.md](SUBMISSION.md).
