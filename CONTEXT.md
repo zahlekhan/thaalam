@@ -38,7 +38,7 @@ The model reads the gist of the whole photo. Code builds a motif from those answ
 | Reading | Controls |
 |---|---|
 | role | which part the card plays |
-| texture (wooden, organic, metallic, electronic, airy) x role | instrument (30, one per role and texture) |
+| texture (wooden, organic, metallic, electronic, airy) x role | which family of instruments. Drums have one kit per texture. Melody, bass, chords and pads have three, and the photo's weight picks among them |
 | energy 1 to 5 | which pattern from the role's menu (sparse to busy). Vivid colour nudges this up a step, grey colour down |
 | gist order | straight rhythm when ordered, syncopated when chaotic. The melody has its own rhythm for ordered, balanced and chaotic |
 | gist gesture | melody shape: rising, falling, level, an arch (round), or scattered |

@@ -4,6 +4,22 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T02:50:17+05:30 — More instruments, picked by weight
+
+- Changed: Melody, bass, chords and pads now have three instruments for each texture. The photo's weight picks among them: a heavier photo gets the darker one, a lighter photo the brighter one, and a medium photo keeps the voice it had. Drums stay on their five kits. Sitar and vibraphone are still not used. 68 sounds in all.
+- Why: The user wanted more instruments after sitar and vibraphone were taken out. Weight is already part of the reading, so two photos with the same texture can play different instruments.
+- Files: `web/src/music.ts`, `CONTEXT.md`.
+- Validation: `npm --prefix web run build` passes. Every sound name is a General MIDI instrument in `@strudel/soundfonts`, a synth waveform (`sine`, `triangle`, `sawtooth`, `square`), or one of the existing drum kits. Not listened to.
+- Limitations: Not listened to. A few pairs share a waveform (square bass and synth stabs). Kick and percussion are unchanged.
+
+## 2026-10-25T02:45:13+05:30 — Less sitar and vibraphone
+
+- Changed: Organic melodies play kalimba instead of sitar. Metallic melodies play celesta instead of vibraphone. Both new sounds decay, so a melody card no longer rings across the loop.
+- Why: The user said there was too much sitar and vibraphone. Those two were the only melody for organic and metallic photos, which are common readings.
+- Files: `web/src/music.ts`.
+- Validation: `npm --prefix web run build` passes. Not listened to.
+- Limitations: Not listened to. Other long sounds (flute, pads, steel drums) are unchanged.
+
 ## 2026-10-25T02:35:27+05:30 — Photo gist and colour mood write the motif
 
 - Changed: A photo's gist now shapes how its part plays, and the colour field votes on the mood. Eight new model questions (space, gesture, order, weight, focus, light, motion, surface) are asked by the local server and the Worker. Pixels now measure saturation, hue clash and edge sharpness. `music.ts` builds the melody from the gesture, the rhythm from order, the room from how open the photo is, the register from weight, holds or short notes from motion, a harmony from how many subjects there are, grit from the surface, and the chord from the light. Vivid colour nudges energy; the colours' own mood votes on the scale, with less weight than the model's mood. The colour-family melody rhythms are gone. Cards show space, gesture and surface under the mood. The six sample readings were re-read with Jev.

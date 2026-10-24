@@ -109,11 +109,16 @@ function chordsFor(r: Reading) {
   return `<${ROOT_LIST.map((root) => `[${notes.map((n) => n + root).join(',')}]`).join(' ')}>`
 }
 
-// One instrument per role and photo texture. Drum banks also hold crashes and odd hits, so
-// `hits` lists the sample numbers that suit a steady beat.
+// Drums: one kit per texture. `hits` lists the sample numbers that suit a steady beat.
+// Melody, bass, chords and pads: three instruments per texture, heavy then medium then light.
+// The middle one is the everyday voice. Sitar and vibraphone are left out; they ring over the loop.
 type Sound = { name: string; label: string; hits?: number[] }
+type Trio = readonly [Sound, Sound, Sound]
+type Slot = Sound | Trio
 
-export const INSTRUMENT: Record<Role, Record<Texture, Sound>> = {
+const tone = (heavy: Sound, medium: Sound, light: Sound): Trio => [heavy, medium, light]
+
+export const INSTRUMENT: Record<Role, Record<Texture, Slot>> = {
   kick: {
     wooden: { name: 'jazz', label: 'Kit kick', hits: [0] },
     organic: { name: '808bd', label: 'Round kick', hits: [0, 1] },
@@ -129,39 +134,123 @@ export const INSTRUMENT: Record<Role, Record<Texture, Sound>> = {
     airy: { name: 'gretsch', label: 'Brushes', hits: [2, 3] },
   },
   bass: {
-    wooden: { name: 'gm_acoustic_bass', label: 'Upright bass' },
-    organic: { name: 'gm_fretless_bass', label: 'Fretless bass' },
-    metallic: { name: 'gm_electric_bass_pick', label: 'Picked bass' },
-    electronic: { name: 'sawtooth', label: 'Synth bass' },
-    airy: { name: 'triangle', label: 'Soft synth bass' },
+    wooden: tone(
+      { name: 'gm_contrabass', label: 'Contrabass' },
+      { name: 'gm_acoustic_bass', label: 'Upright bass' },
+      { name: 'gm_electric_bass_finger', label: 'Finger bass' },
+    ),
+    organic: tone(
+      { name: 'gm_cello', label: 'Cello' },
+      { name: 'gm_fretless_bass', label: 'Fretless bass' },
+      { name: 'gm_pizzicato_strings', label: 'Pizzicato' },
+    ),
+    metallic: tone(
+      { name: 'gm_slap_bass_1', label: 'Slap bass' },
+      { name: 'gm_electric_bass_pick', label: 'Picked bass' },
+      { name: 'gm_slap_bass_2', label: 'Pop bass' },
+    ),
+    electronic: tone(
+      { name: 'gm_synth_bass_1', label: 'Deep synth bass' },
+      { name: 'sawtooth', label: 'Synth bass' },
+      { name: 'square', label: 'Square bass' },
+    ),
+    airy: tone(
+      { name: 'sine', label: 'Round bass' },
+      { name: 'triangle', label: 'Soft synth bass' },
+      { name: 'gm_synth_bass_2', label: 'Analog bass' },
+    ),
   },
   chords: {
-    wooden: { name: 'gm_acoustic_guitar_nylon', label: 'Nylon guitar' },
-    organic: { name: 'gm_epiano1', label: 'Soft keys' },
-    metallic: { name: 'gm_steel_drums', label: 'Steel drums' },
-    electronic: { name: 'square', label: 'Synth stabs' },
-    airy: { name: 'gm_reed_organ', label: 'Reed organ' },
+    wooden: tone(
+      { name: 'gm_acoustic_guitar_steel', label: 'Steel guitar' },
+      { name: 'gm_acoustic_guitar_nylon', label: 'Nylon guitar' },
+      { name: 'gm_guitar_harmonics', label: 'Harmonics' },
+    ),
+    organic: tone(
+      { name: 'gm_epiano2', label: 'Hard keys' },
+      { name: 'gm_epiano1', label: 'Soft keys' },
+      { name: 'gm_orchestral_harp', label: 'Harp' },
+    ),
+    metallic: tone(
+      { name: 'gm_electric_guitar_jazz', label: 'Jazz guitar' },
+      { name: 'gm_steel_drums', label: 'Steel drums' },
+      { name: 'gm_clavinet', label: 'Clavinet' },
+    ),
+    electronic: tone(
+      { name: 'gm_synth_brass_1', label: 'Synth brass' },
+      { name: 'square', label: 'Synth stabs' },
+      { name: 'gm_percussive_organ', label: 'Perc organ' },
+    ),
+    airy: tone(
+      { name: 'gm_accordion', label: 'Accordion' },
+      { name: 'gm_reed_organ', label: 'Reed organ' },
+      { name: 'gm_drawbar_organ', label: 'Drawbar organ' },
+    ),
   },
   melody: {
-    wooden: { name: 'gm_marimba', label: 'Marimba' },
-    organic: { name: 'gm_sitar', label: 'Sitar' },
-    metallic: { name: 'gm_vibraphone', label: 'Vibraphone' },
-    electronic: { name: 'triangle', label: 'Synth beeps' },
-    airy: { name: 'gm_flute', label: 'Flute' },
+    wooden: tone(
+      { name: 'gm_banjo', label: 'Banjo' },
+      { name: 'gm_marimba', label: 'Marimba' },
+      { name: 'gm_dulcimer', label: 'Dulcimer' },
+    ),
+    organic: tone(
+      { name: 'gm_clarinet', label: 'Clarinet' },
+      { name: 'gm_kalimba', label: 'Kalimba' },
+      { name: 'gm_ocarina', label: 'Ocarina' },
+    ),
+    metallic: tone(
+      { name: 'gm_electric_guitar_muted', label: 'Muted guitar' },
+      { name: 'gm_celesta', label: 'Celesta' },
+      { name: 'gm_music_box', label: 'Music box' },
+    ),
+    electronic: tone(
+      { name: 'gm_lead_2_sawtooth', label: 'Saw lead' },
+      { name: 'triangle', label: 'Synth beeps' },
+      { name: 'gm_lead_4_chiff', label: 'Soft lead' },
+    ),
+    airy: tone(
+      { name: 'gm_shakuhachi', label: 'Shakuhachi' },
+      { name: 'gm_flute', label: 'Flute' },
+      { name: 'gm_blown_bottle', label: 'Blown bottle' },
+    ),
   },
   texture: {
-    wooden: { name: 'gm_pad_bowed', label: 'Bowed pad' },
-    organic: { name: 'gm_pad_warm', label: 'Warm pad' },
-    metallic: { name: 'gm_pad_metallic', label: 'Metal pad' },
-    electronic: { name: 'gm_pad_poly', label: 'Synth pad' },
-    airy: { name: 'gm_pad_halo', label: 'Halo pad' },
+    wooden: tone(
+      { name: 'gm_string_ensemble_1', label: 'Strings' },
+      { name: 'gm_pad_bowed', label: 'Bowed pad' },
+      { name: 'gm_string_ensemble_2', label: 'Soft strings' },
+    ),
+    organic: tone(
+      { name: 'gm_synth_strings_1', label: 'Synth strings' },
+      { name: 'gm_pad_warm', label: 'Warm pad' },
+      { name: 'gm_pad_new_age', label: 'New age pad' },
+    ),
+    metallic: tone(
+      { name: 'gm_fx_crystal', label: 'Crystal' },
+      { name: 'gm_pad_metallic', label: 'Metal pad' },
+      { name: 'gm_pad_sweep', label: 'Sweep pad' },
+    ),
+    electronic: tone(
+      { name: 'gm_synth_strings_2', label: 'Digital strings' },
+      { name: 'gm_pad_poly', label: 'Synth pad' },
+      { name: 'gm_fx_atmosphere', label: 'Atmosphere' },
+    ),
+    airy: tone(
+      { name: 'gm_pad_choir', label: 'Choir pad' },
+      { name: 'gm_pad_halo', label: 'Halo pad' },
+      { name: 'gm_voice_oohs', label: 'Soft voices' },
+    ),
   },
 }
 
 const OCTAVE: Record<Role, number> = { kick: 0, percussion: 0, bass: 2, chords: 3, melody: 4, texture: 3 }
 
+const WEIGHT_INDEX = { heavy: 0, medium: 1, light: 2 } as const
+
 export function instrumentFor(r: Reading): Sound {
-  return INSTRUMENT[r.role][r.texture]
+  const slot = INSTRUMENT[r.role][r.texture]
+  if ('name' in slot) return slot
+  return slot[WEIGHT_INDEX[r.gist.weight]]
 }
 
 export function partFor(r: Reading, scale: string): string {
