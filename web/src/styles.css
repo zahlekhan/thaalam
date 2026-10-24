@@ -692,6 +692,7 @@ p {
 .copy {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   height: 48px;
   padding: 0 calc(var(--u) * 2);
@@ -699,6 +700,10 @@ p {
   background: var(--invite);
   color: #fff;
   font-weight: 650;
+}
+.copy.wide {
+  width: 100%;
+  margin-top: calc(var(--u) * 1.5);
 }
 .copy:hover {
   background: var(--invite-hover);

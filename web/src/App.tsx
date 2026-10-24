@@ -631,7 +631,6 @@ function useEnsureRoom({ room, setRoom }: ReturnType<typeof usePeers>) {
 function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnType<typeof usePeers> }) {
   const room = useEnsureRoom(peers)
   const [copied, setCopied] = useState(false)
-  const linkRef = useRef<HTMLInputElement>(null)
   const link = room ? location.href : ''
 
   const copy = async () => {
@@ -640,8 +639,7 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      linkRef.current?.select()
-      toast("Couldn't copy automatically. The link is selected, so copy it from there.")
+      toast("Couldn't copy automatically. Copy the address bar instead.")
     }
   }
 
@@ -652,13 +650,10 @@ function InviteSheet({ onClose, peers }: { onClose: () => void; peers: ReturnTyp
           <Qr text={link} />
           <div>
             <p className="hint">Scan this, or send the link. Anyone with it can add, move and mute photos.</p>
-            <div className="link-row">
-              <input ref={linkRef} readOnly value={link} aria-label="Room link" onFocus={(e) => e.target.select()} />
-              <button className="copy" onClick={copy} data-autofocus>
-                <CopyIcon size={18} />
-                {copied ? 'Copied' : 'Copy'}
-              </button>
-            </div>
+            <button className="copy wide" onClick={copy} data-autofocus>
+              <CopyIcon size={18} />
+              {copied ? 'Copied' : 'Copy link'}
+            </button>
           </div>
         </div>
       )}

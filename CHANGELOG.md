@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T01:20:00+05:30 — Hide the room link input in Invite
+
+- Changed: The invite sheet no longer shows the room URL in a readonly input; a full-width "Copy link" button sits beside the QR. Copy fallback now asks people to copy the address bar.
+- Why: The truncated URL field added nothing over Copy and the QR code.
+- Validation: `npm --prefix web run build` passes.
+- Limitations: None identified.
+
 ## 2026-10-25T01:10:00+05:30 — Page metadata, favicon and share card
 
 - Changed: `web/index.html` now has a description, theme-color, canonical URL, Open Graph and Twitter card tags, and favicon links. New `web/public/og.png` (1200x630 share card rendered with Pillow: tilted photo cards with role-colour magnets on the enamel background), `favicon.svg`, `favicon-32.png` and `apple-touch-icon.png`.
