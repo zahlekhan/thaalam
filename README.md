@@ -27,7 +27,7 @@ Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[D
    TYPESAFE_API_KEY=... ./server/dev.sh        # API on http://127.0.0.1:8000
    npm --prefix web run dev                     # app on http://localhost:5180, proxies /api
    ```
-   Add `?dev` to the URL to switch between the models the server reports in `/api/health`.
+   Use the Options menu (bottom right) to switch between the models the server reports in `/api/health`.
 5. **Checks:** `npm --prefix web run build` (TypeScript check plus Vite build). There are no automated tests yet.
 
 ### Deploy
@@ -37,7 +37,7 @@ Built at the hackathon from scratch. **[Agent instructions](AGENTS.md)** · **[D
 
 ### Current status
 
-- **Working features:** tldraw canvas with a stage frame; drop, paste or upload photos to make cards; cards on the stage play and cards off it stay silent; a mix of tempo, scale and parts across all stage cards; a tray of 6 sample photos with precomputed Jev readings; a code view showing the generated Strudel pattern; a `?dev` model picker; local FastAPI server and hosted Cloudflare Worker.
+- **Working features:** tldraw canvas with a stage frame; drop, paste or upload photos to make cards; cards on the stage play and cards off it stay silent; a mix of tempo, scale and parts across all stage cards; a tray of 6 sample photos with precomputed Jev readings; an Options menu (bottom right) with a code view showing the generated Strudel pattern and a model picker; local FastAPI server and hosted Cloudflare Worker.
 - **Known limitations:** Rooms (multiplayer) are not built yet. vegaml is local-only and is not available on Cloudflare. The key is fixed and all cards play at the same volume. If the model call fails, a card plays from pixel measurements alone. tldraw shows its SDK license watermark. `server/dev.sh` falls back to reading the key from `../../seefood/.dev.vars`.
 - **Libraries, APIs, and public datasets used:** [tldraw](https://tldraw.dev) (SDK license, watermark on free use), [Strudel](https://strudel.cc) (`@strudel/web`, `@strudel/soundfonts`, AGPL-3.0), [React](https://react.dev), [Vite](https://vite.dev), [FastAPI](https://fastapi.tiangolo.com), [Pillow](https://python-pillow.org), [httpx](https://www.python-httpx.org), [Jev / TypeSafe API](https://typesafe.ai), vegaml (local open model, Apache 2.0), [Cloudflare Workers](https://developers.cloudflare.com/workers/). Sample photos are from Unsplash under the Unsplash License; see [web/public/samples/CREDITS.md](web/public/samples/CREDITS.md).
 

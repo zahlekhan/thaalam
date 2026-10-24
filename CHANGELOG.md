@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-24T22:11:43+05:30 — Options menu at the bottom right
+
+- Changed: Added an "Options" button at the bottom right of `web/src/App.tsx` that opens a menu with "Show code" and the model picker. Removed the "Code" button and the `?dev`-only model select from the top bar (`web/src/styles.css`, `README.md`, `SUBMISSION.md`).
+- Why: Keep the top bar for the main actions and gather settings in one place.
+- Validation: `npx tsc -b` passed. Checked in headless Chrome at 1280x800 and 390x844 against a stub `/api/health`: the menu opens, lists Jev and vegaml, and "Show code" shows the code panel.
+- Limitations: The model picker is now visible to everyone (no longer behind `?dev`); it is hidden when `/api/health` is unreachable. On narrow phones the code panel still overlaps the wrapped top bar, as before.
+
 ## 2026-10-24T21:44:19+05:30 — Add hackathon documentation
 
 - Changed: Added `README.md`, `AGENTS.md`, `CHANGELOG.md`, `AI_USAGE.md`, `SUBMISSION.md` and `.github/pull_request_template.md` from the hackathon template, filled in from the existing code and `CONTEXT.md`. Entries below are backfilled from git history.

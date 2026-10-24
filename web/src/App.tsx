@@ -22,8 +22,7 @@ type Sample = {
   readings: Record<string, ModelReading>
 }
 
-// Which model reads photos. Jev by default; developers can switch with ?dev in the URL.
-const DEV = new URLSearchParams(location.search).has('dev')
+// Which model reads photos. Jev by default; switch it from the Options menu.
 let currentModel = localStorage.getItem('thaalam-model') ?? 'jev'
 
 // A shared link drops you straight into its room.
@@ -220,6 +219,7 @@ function Overlay() {
   const { n, room, setRoom } = usePeers()
   const [on, setOn] = useState(false)
   const [showCode, setShowCode] = useState(false)
+  const [optionsOpen, setOptionsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [samples, setSamples] = useState<Sample[]>([])
   const [models, setModels] = useState<string[]>([])
@@ -280,16 +280,6 @@ function Overlay() {
         <button onClick={invite} title={room ? `Room ${room}` : 'Create a room and copy its link'}>
           {copied ? 'Link copied' : room ? `Room · ${n} here` : 'Invite friends'}
         </button>
-        <button onClick={() => setShowCode((v) => !v)}>{showCode ? 'Hide code' : 'Code'}</button>
-        {DEV && (
-          <select className="model" value={model} onChange={(e) => pickModel(e.target.value)} title="Model that reads photos">
-            {models.map((m) => (
-              <option key={m} value={m}>
-                {m === 'jev' ? 'Jev' : m === 'vegaml' ? 'vegaml (local)' : m}
-              </option>
-            ))}
-          </select>
-        )}
         <input
           ref={fileRef}
           type="file"
@@ -304,6 +294,32 @@ function Overlay() {
       </div>
 
       {showCode && <pre className="code">{m.code || '// nothing on the stage yet'}</pre>}
+
+      <div className="options">
+        {optionsOpen && (
+          <div className="options-menu">
+            <label>
+              <input type="checkbox" checked={showCode} onChange={(e) => setShowCode(e.target.checked)} />
+              Show code
+            </label>
+            {models.length > 0 && (
+              <label>
+                Model
+                <select value={model} onChange={(e) => pickModel(e.target.value)} title="Model that reads photos">
+                  {models.map((m) => (
+                    <option key={m} value={m}>
+                      {m === 'jev' ? 'Jev' : m === 'vegaml' ? 'vegaml (local)' : m}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
+        )}
+        <button className="options-toggle" onClick={() => setOptionsOpen((v) => !v)} aria-expanded={optionsOpen}>
+          {optionsOpen ? 'Close' : 'Options'}
+        </button>
+      </div>
 
       {samples.length > 0 && (
         <div className="tray">
