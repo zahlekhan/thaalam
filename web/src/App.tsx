@@ -878,7 +878,7 @@ function JoinSheet({ onJoin }: { onJoin: (withSound: boolean) => void }) {
         }}
       >
         <Wordmark />
-        <h1 id="join-title">{inRoom ? 'Join the jam' : 'Make a loop from photos'}</h1>
+        <h1 id="join-title">{inRoom ? 'Join the jam' : 'Make music from your photos'}</h1>
         <p className="lede">Stick photos on the fridge. Each one plays a part, and they all play together.</p>
         <label className="name-field">
           Your name

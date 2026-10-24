@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T01:45:00+05:30 — New tagline: Make music from your photos
+
+- Changed: Page title, Open Graph and Twitter titles now read "Thaalam — make music from your photos"; descriptions lead with the same line. The join sheet's first-screen headline matches.
+- Why: New tagline from the user.
+- Validation: `npm --prefix web run build` passes.
+- Limitations: The OG image still carries the older wording; regenerate `web/public/og.png` if the text there should match.
+
 ## 2026-10-25T01:53:00+05:30 — Fridge intro: disc magnets, no loose pins
 
 - Changed: Print magnets on the 3D fridge are flat plastic discs with a rounded rim instead of squashed spheres, and the empty door no longer shows six loose magnets. Files: `web/src/FridgeIntro.tsx`, `DESIGN.md`.
