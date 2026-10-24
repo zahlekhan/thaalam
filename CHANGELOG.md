@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-25T01:30:00+05:30 — Prints swing on their magnets
+
+- Changed: New `web/src/swing.ts`: each card gets two spring animations driven by one rAF loop — a swing around the magnet while dragged (own drags and remote ones), a lift off the door (`rotateX`) on each of its notes, a press-on when added, and a snap when its reading lands. `CardShape.tsx` registers prints with the loop; `sound.ts` replaces the old magnet bounce with `pluck()`. CSS: cards pivot at the magnet (`transform-origin`), scale up while dragging, magnets get a light glint.
+- Why: Make the fridge feel physical — prints hang like paper, not divs.
+- Validation: `npm --prefix web run build` passes.
+- Limitations: Spring constants tuned by eye; `prefers-reduced-motion` still respected via the `still` check in `swing.ts`.
+
 ## 2026-10-25T01:15:00+05:30 — Prints hang and swing from their magnets
 
 - Changed: New `web/src/swing.ts` gives every card two small springs, driven by one animation loop that stops when all prints rest. Prints pivot on their magnet: dragging (yours or anyone's in the room) swings the print behind the pointer and lifts it off the door; on release it swings back and settles. On each note the magnet squashes and stretches and the paper lifts about 3 degrees in perspective. New cards are pressed onto the door and their magnet snaps on; a magnet also snaps when its reading arrives. Magnets got a glint. `sound.ts` now calls `pluck()` instead of the old bounce. Files: `web/src/swing.ts`, `CardShape.tsx`, `sound.ts`, `styles.css`, `README.md`, `DESIGN.md`.
